@@ -20,9 +20,9 @@
 
 'use strict';
 
-const _ = require('lodash');
-const EntityId = require('../entityId');
-const utils = require('../utils');
+import _ from 'lodash';
+import EntityId from '../entityId';
+import utils from '../utils';
 
 /**
  * Contract results view model
@@ -52,4 +52,4 @@ class ContractResultViewModel {
   }
 }
 
-module.exports = ContractResultViewModel;
+export default ContractResultViewModel;

@@ -20,7 +20,7 @@
 
 'use strict';
 
-module.exports = {
+export default {
   ContractService: require('./contractService'),
   CryptoAllowanceService: require('./cryptoAllowanceService'),
   EntityService: require('./entityService'),

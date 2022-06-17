@@ -20,9 +20,9 @@
 
 'use strict';
 
-const BaseService = require('./baseService');
-const {CryptoAllowance} = require('../model');
-const {OrderSpec} = require('../sql');
+import BaseService from './baseService';
+import {CryptoAllowance} from '../model';
+import {OrderSpec} from '../sql';
 
 /**
  * CryptoAllowance business model
@@ -50,4 +50,4 @@ class CryptoAllowanceService extends BaseService {
   }
 }
 
-module.exports = new CryptoAllowanceService();
+export default new CryptoAllowanceService();

@@ -20,7 +20,7 @@
 
 'use strict';
 
-const {InvalidArgumentError} = require('../errors/invalidArgumentError');
+import errors from '../errors/index.js';
 
 class TokenKycStatus {
   static STATUSES = ['NOT_APPLICABLE', 'GRANTED', 'REVOKED'];
@@ -28,7 +28,7 @@ class TokenKycStatus {
   constructor(id) {
     this._id = Number(id);
     if (Number.isNaN(this._id) || this._id < 0 || this._id > 2) {
-      throw new InvalidArgumentError(`Invalid token kyc status id ${id}`);
+      throw new errors.InvalidArgumentError(`Invalid token kyc status id ${id}`);
     }
   }
 
@@ -45,4 +45,4 @@ class TokenKycStatus {
   }
 }
 
-module.exports = TokenKycStatus;
+export default TokenKycStatus;

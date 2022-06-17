@@ -20,8 +20,8 @@
 
 'use strict';
 
-const {execSync} = require('child_process');
-const path = require('path');
+import {execSync} from 'child_process';
+import path from 'path';
 
 if (
   process.env.NODE_ENV === 'production' ||

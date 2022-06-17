@@ -20,7 +20,7 @@
 
 'use strict';
 
-const base32 = require('../base32');
+import base32 from '../base32';
 
 describe('decode', () => {
   describe('valid', () => {

@@ -20,12 +20,12 @@
 
 'use strict';
 
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const yaml = require('js-yaml');
-const _ = require('lodash');
-const {cloudProviders, defaultBucketNames, networks} = require('../constants');
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import yaml from 'js-yaml';
+import _ from 'lodash';
+import {cloudProviders, defaultBucketNames, networks} from '../constants';
 
 let tempDir;
 const custom = {

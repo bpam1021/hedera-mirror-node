@@ -20,7 +20,7 @@
 
 'use strict';
 
-const utils = require('../utils');
+import utils from '../utils';
 
 /**
  * Network supply view model
@@ -43,4 +43,4 @@ class NetworkSupplyViewModel {
   }
 }
 
-module.exports = NetworkSupplyViewModel;
+export default NetworkSupplyViewModel;

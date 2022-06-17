@@ -20,8 +20,8 @@
 
 'use strict';
 
-const _ = require('lodash');
-const {InvalidArgumentError} = require('../errors/invalidArgumentError');
+import _ from 'lodash';
+import errors from '../errors/index.js';
 
 const protoToName = {
   7: 'CONTRACTCALL',
@@ -79,12 +79,13 @@ const getName = (protoId) => {
 
 const getProtoId = (name) => {
   if (!_.isString(name)) {
-    throw new InvalidArgumentError(`Invalid argument ${name} is not a string`);
+    throw new errors.InvalidArgumentError(`Invalid argument ${name} is not a string`);
   }
 
-  const type = nameToProto[name.toUpperCase()];
+  const nameUpper = name.toUpperCase();
+  const type = nameToProto[nameUpper];
   if (!type) {
-    throw new InvalidArgumentError(`Invalid transaction type ${name.toUpperCase()}`);
+    throw new errors.InvalidArgumentError(`Invalid transaction type ${nameUpper}`);
   }
   return type;
 };
@@ -96,7 +97,7 @@ const isValid = (name) => {
   return nameToProto[name.toUpperCase()] !== undefined;
 };
 
-module.exports = {
+export default {
   isValid,
   getName,
   getProtoId,

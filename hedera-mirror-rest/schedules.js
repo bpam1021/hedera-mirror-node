@@ -20,16 +20,12 @@
 
 'use strict';
 
-const {
-  response: {
-    limit: {default: defaultLimit},
-  },
-} = require('./config');
-const constants = require('./constants');
-const EntityId = require('./entityId');
-const {SignatureType} = require('./model');
-const utils = require('./utils');
-const {NotFoundError} = require('./errors/notFoundError');
+import {response} from './config';
+import constants from './constants';
+import EntityId from './entityId';
+import {SignatureType} from './model';
+import utils from './utils';
+import {NotFoundError} from './errors/notFoundError';
 
 const scheduleSelectFields = [
   'e.key',
@@ -258,7 +254,7 @@ const getSchedules = async (req, res) => {
   res.locals[constants.responseDataLabel] = schedulesResponse;
 };
 
-module.exports = {
+export default {
   getScheduleById,
   getSchedules,
 };

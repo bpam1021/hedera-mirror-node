@@ -18,9 +18,7 @@
  * ‍
  */
 
-'use strict';
-
-const RecordStreamObject = require('../../stream/recordStreamObject');
+import RecordStreamObject from '../../stream/recordStreamObject.js';
 
 describe('RecordStreamObject', () => {
   const classId = BigInt.asIntN(64, BigInt('0xe370929ba5429d8b'));
@@ -41,33 +39,33 @@ describe('RecordStreamObject', () => {
     )
   );
 
-  test('getLength', () => {
+  it('getLength', () => {
     const expected = buffer.length;
     const recordStreamObject = new RecordStreamObject(buffer);
     expect(recordStreamObject.getLength()).toEqual(expected);
   });
 
-  test('classId', () => {
+  it('classId', () => {
     const recordStreamObject = new RecordStreamObject(buffer);
     expect(recordStreamObject.classId).toEqual(classId);
   });
 
-  test('classVersion', () => {
+  it('classVersion', () => {
     const recordStreamObject = new RecordStreamObject(buffer);
     expect(recordStreamObject.classVersion).toEqual(classVersion);
   });
 
-  test('recordBytes', () => {
+  it('recordBytes', () => {
     const recordStreamObject = new RecordStreamObject(buffer);
     expect(recordStreamObject.record).toEqual(Buffer.from(recordBytes));
   });
 
-  test('transactionBytes', () => {
+  it('transactionBytes', () => {
     const recordStreamObject = new RecordStreamObject(buffer);
     expect(recordStreamObject.transaction).toEqual(Buffer.from(transactionBytes));
   });
 
-  test('truncated buffer', () => {
+  it('truncated buffer', () => {
     expect(() => new RecordStreamObject(buffer.slice(0, buffer.length - 4))).toThrowErrorMatchingSnapshot();
   });
 });

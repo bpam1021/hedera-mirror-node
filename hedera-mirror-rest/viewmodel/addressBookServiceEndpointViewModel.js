@@ -35,4 +35,4 @@ class AddressBookServiceEndpointViewModel {
   }
 }
 
-module.exports = AddressBookServiceEndpointViewModel;
+export default AddressBookServiceEndpointViewModel;

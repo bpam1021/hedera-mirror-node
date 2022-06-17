@@ -20,9 +20,9 @@
 
 'use strict';
 
-const log4js = require('log4js');
-const EntityId = require('../entityId');
-const TransactionId = require('../transactionId');
+import log4js from 'log4js';
+import EntityId from '../entityId';
+import TransactionId from '../transactionId';
 
 // create a minimal global logger for transactionId to log errors.
 global.logger = log4js.getLogger();

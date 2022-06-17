@@ -20,12 +20,11 @@
 
 'use strict';
 
-const sinon = require('sinon');
-
-const config = require('../config');
-const EntityId = require('../entityId');
-const utils = require('../utils.js');
-const constants = require('../constants.js');
+import sinon from 'sinon';
+import config from '../config';
+import EntityId from '../entityId';
+import utils from '../utils.js';
+import constants from '../constants.js';
 
 describe('utils buildAndValidateFilters test', () => {
   const defaultMaxRepeatedQueryParameters = config.maxRepeatedQueryParameters;

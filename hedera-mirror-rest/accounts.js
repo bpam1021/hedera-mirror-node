@@ -20,15 +20,14 @@
 
 'use strict';
 
-const AccountAlias = require('./accountAlias');
-const base32 = require('./base32');
-const {getAccountContractUnionQueryWithOrder} = require('./accountContract');
-const constants = require('./constants');
-const EntityId = require('./entityId');
-const utils = require('./utils');
-const {EntityService} = require('./service');
-const transactions = require('./transactions');
-const {NotFoundError} = require('./errors/notFoundError');
+import base32 from './base32.js';
+import {getAccountContractUnionQueryWithOrder} from './accountContract.js';
+import * as constants from './constants.js';
+import EntityId from './entityId.js';
+import * as utils from './utils.js';
+import service from './service/index.js';
+import transactions from './transactions.js';
+import errors from './errors/index.js';
 
 /**
  * Processes one row of the results of the SQL query and format into API return format
@@ -399,7 +398,9 @@ const getOneAccount = async (req, res) => {
   // Validate query parameters first
   utils.validateReq(req);
 
-  const encodedId = await EntityService.getEncodedId(req.params[constants.filterKeys.ID_OR_ALIAS_OR_EVM_ADDRESS]);
+  const encodedId = await service.EntityService.getEncodedId(
+    req.params[constants.filterKeys.ID_OR_ALIAS_OR_EVM_ADDRESS]
+  );
 
   // Parse the filter parameters for account-numbers, balance, and pagination
   const parsedQueryParams = req.query;
@@ -451,11 +452,11 @@ const getOneAccount = async (req, res) => {
   const [entityResults, transactionsResults] = await Promise.all([entityPromise, transactionsPromise]);
   // Process the results of entities query
   if (entityResults.rows.length === 0) {
-    throw new NotFoundError();
+    throw new errors.NotFoundError();
   }
 
   if (entityResults.rows.length !== 1) {
-    throw new NotFoundError('Error: Could not get entity information');
+    throw new errors.NotFoundError('Error: Could not get entity information');
   }
 
   const ret = processRow(entityResults.rows[0]);
@@ -489,14 +490,10 @@ const getOneAccount = async (req, res) => {
   res.locals[constants.responseDataLabel] = ret;
 };
 
-module.exports = {
+export default {
   getAccounts,
   getOneAccount,
+  // for unit tests
+  getBalanceParamValue,
+  processRow,
 };
-
-if (utils.isTestEnv()) {
-  Object.assign(module.exports, {
-    getBalanceParamValue,
-    processRow,
-  });
-}

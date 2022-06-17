@@ -18,9 +18,7 @@
  * ‍
  */
 
-'use strict';
-
-const {InvalidArgumentError} = require('../errors/invalidArgumentError');
+import errors from '../errors/index.js';
 
 class TokenFreezeStatus {
   static STATUSES = ['NOT_APPLICABLE', 'FROZEN', 'UNFROZEN'];
@@ -28,7 +26,7 @@ class TokenFreezeStatus {
   constructor(id) {
     this._id = Number(id);
     if (Number.isNaN(this._id) || this._id < 0 || this._id > 2) {
-      throw new InvalidArgumentError(`Invalid token freeze status id ${id}`);
+      throw new errors.InvalidArgumentError(`Invalid token freeze status id ${id}`);
     }
   }
 
@@ -45,4 +43,4 @@ class TokenFreezeStatus {
   }
 }
 
-module.exports = TokenFreezeStatus;
+export default TokenFreezeStatus;

@@ -20,9 +20,9 @@
 
 'use strict';
 
-const {proto} = require('@hashgraph/proto');
-const {TransactionType} = require('../../model');
-const {InvalidArgumentError} = require('../../errors/invalidArgumentError');
+import {proto} from '@hashgraph/proto';
+import {TransactionType} from '../../model';
+import {InvalidArgumentError} from '../../errors/invalidArgumentError';
 
 const hederaFunctionalityLength = 71;
 const cryptoCreateAccountProtoId = 11;

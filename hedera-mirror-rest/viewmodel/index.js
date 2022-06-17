@@ -20,7 +20,7 @@
 
 'use strict';
 
-module.exports = {
+export default {
   AddressBookServiceEndpointViewModel: require('./addressBookServiceEndpointViewModel'),
   AssessedCustomFeeViewModel: require('./assessedCustomFeeViewModel'),
   CustomFeeViewModel: require('./customFeeViewModel'),

@@ -20,6 +20,6 @@
 
 'use strict';
 
-module.exports = {
+export default {
   OrderSpec: require('./orderSpec'),
 };

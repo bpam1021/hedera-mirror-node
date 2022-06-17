@@ -20,10 +20,10 @@
 
 'use strict';
 
-const BaseService = require('./baseService');
-const constants = require('../constants');
-const {OrderSpec} = require('../sql');
-const {TokenAllowance} = require('../model');
+import BaseService from './baseService';
+import constants from '../constants';
+import {OrderSpec} from '../sql';
+import {TokenAllowance} from '../model';
 
 /**
  * TokenAllowance business model
@@ -108,4 +108,4 @@ class TokenAllowanceService extends BaseService {
   }
 }
 
-module.exports = new TokenAllowanceService();
+export default new TokenAllowanceService();

@@ -20,16 +20,15 @@
 
 'use strict';
 
-const {proto} = require('@hashgraph/proto');
-
-const utils = require('../utils.js');
-const config = require('../config.js');
-const constants = require('../constants.js');
-const {InvalidArgumentError} = require('../errors/invalidArgumentError');
-const {InvalidClauseError} = require('../errors/invalidClauseError');
-const {TransactionType} = require('../model');
-const {getLimitParamValue} = require('../utils');
-const {keyTypes} = require('../constants');
+import {proto} from '@hashgraph/proto';
+import utils from '../utils.js';
+import config from '../config.js';
+import constants from '../constants.js';
+import {InvalidArgumentError} from '../errors/invalidArgumentError';
+import {InvalidClauseError} from '../errors/invalidClauseError';
+import {TransactionType} from '../model';
+import {getLimitParamValue} from '../utils';
+import {keyTypes} from '../constants';
 
 const ecdsaKey = '02b5ffadf88d625cd9074fa01e5280b773a60ed2de55b0d6f94460c0b5a001a258';
 const ecdsaProtoKey = {ECDSASecp256k1: Buffer.from(ecdsaKey, 'hex')};

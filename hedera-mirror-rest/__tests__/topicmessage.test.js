@@ -20,10 +20,10 @@
 
 'use strict';
 
-const topicmessage = require('../topicmessage.js');
-const constants = require('../constants.js');
-const EntityId = require('../entityId');
-const {assertSqlQueryEqual} = require('./testutils');
+import topicmessage from '../topicmessage.js';
+import constants from '../constants.js';
+import EntityId from '../entityId';
+import {assertSqlQueryEqual} from './testutils';
 
 describe('topicmessage validateConsensusTimestampParam tests', () => {
   test('Verify validateConsensusTimestampParam throws error for -1234567890.000000001', () => {

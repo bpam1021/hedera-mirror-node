@@ -20,12 +20,11 @@
 
 'use strict';
 
-const _ = require('lodash');
-
-const utils = require('../utils');
+import _ from 'lodash';
+import utils from '../utils';
 
 // errors
-const {InvalidArgumentError} = require('../errors/invalidArgumentError');
+import {InvalidArgumentError} from '../errors/invalidArgumentError';
 
 class BaseController {
   updateConditionsAndParamsWithValues = (
@@ -193,4 +192,4 @@ class BaseController {
   }
 }
 
-module.exports = BaseController;
+export default BaseController;

@@ -20,29 +20,26 @@
 
 'use strict';
 
-const _ = require('lodash');
-const {
-  network: {unreleasedSupplyAccounts: defaultUnreleasedSupplyAccounts},
-} = require('../config');
-const constants = require('../constants');
-const utils = require('../utils');
+import _ from 'lodash';
+import {network} from '../config';
+import constants from '../constants';
+import utils from '../utils';
+import BaseController from './baseController';
+import {AddressBookEntry, FileData} from '../model';
+import {FileDataService, NetworkNodeService} from '../service';
 
-const BaseController = require('./baseController');
-
-const {AddressBookEntry, FileData} = require('../model');
-const {FileDataService, NetworkNodeService} = require('../service');
-const {
+import {
   ExchangeRateSetViewModel,
   NetworkNodeViewModel,
   NetworkSupplyViewModel,
   FeeScheduleViewModel,
-} = require('../viewmodel');
+} from '../viewmodel';
 
 // errors
-const {InvalidArgumentError} = require('../errors/invalidArgumentError');
+import {InvalidArgumentError} from '../errors/invalidArgumentError';
 
-const entityId = require('../entityId');
-const {NotFoundError} = require('../errors/notFoundError');
+import entityId from '../entityId';
+import {NotFoundError} from '../errors/notFoundError';
 
 const networkNodesDefaultSize = 10;
 const networkNodesMaxSize = 25;
@@ -275,4 +272,4 @@ class NetworkController extends BaseController {
   };
 }
 
-module.exports = new NetworkController();
+export default new NetworkController();

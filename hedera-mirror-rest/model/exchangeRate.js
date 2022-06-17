@@ -18,10 +18,8 @@
  * ‍
  */
 
-'use strict';
-
-const {proto} = require('@hashgraph/proto');
-const {FileDecodeError} = require('../errors/fileDecodeError');
+import {proto} from '@hashgraph/proto';
+import errors from '../errors/index.js';
 
 class ExchangeRate {
   /**
@@ -34,7 +32,7 @@ class ExchangeRate {
     try {
       exchangeRateSet = proto.ExchangeRateSet.decode(Buffer.from(exchangeRate.file_data, 'hex'));
     } catch (error) {
-      throw new FileDecodeError(error.message);
+      throw new errors.FileDecodeError(error.message);
     }
 
     this.current_cent = exchangeRateSet.currentRate.centEquiv;
@@ -47,4 +45,4 @@ class ExchangeRate {
   }
 }
 
-module.exports = ExchangeRate;
+export default ExchangeRate;

@@ -20,24 +20,17 @@
 
 'use strict';
 
-const _ = require('lodash');
-
-const {
-  response: {
-    limit: {default: defaultLimit},
-  },
-} = require('../config');
-const constants = require('../constants');
-const utils = require('../utils');
-
-const BaseController = require('./baseController');
-
-const {CryptoAllowance} = require('../model');
-const {CryptoAllowanceService, EntityService} = require('../service');
-const {CryptoAllowanceViewModel} = require('../viewmodel');
+import _ from 'lodash';
+import {response} from '../config';
+import constants from '../constants';
+import utils from '../utils';
+import BaseController from './baseController';
+import {CryptoAllowance} from '../model';
+import {CryptoAllowanceService, EntityService} from '../service';
+import {CryptoAllowanceViewModel} from '../viewmodel';
 
 // errors
-const {InvalidArgumentError} = require('../errors/invalidArgumentError');
+import {InvalidArgumentError} from '../errors/invalidArgumentError';
 
 class CryptoAllowanceController extends BaseController {
   /**
@@ -120,4 +113,4 @@ class CryptoAllowanceController extends BaseController {
   };
 }
 
-module.exports = new CryptoAllowanceController();
+export default new CryptoAllowanceController();

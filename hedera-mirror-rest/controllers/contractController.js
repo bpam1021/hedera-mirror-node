@@ -20,35 +20,33 @@
 
 'use strict';
 
-const _ = require('lodash');
-const {Range} = require('pg-range');
-
-const {
-  response: {
-    limit: {default: defaultLimit},
-  },
-} = require('../config');
-const constants = require('../constants');
-const EntityId = require('../entityId');
+import _ from 'lodash';
+import {Range} from 'pg-range';
+import {response} from '../config';
+import constants from '../constants';
+import EntityId from '../entityId';
 
 // errors
-const {InvalidArgumentError} = require('../errors/invalidArgumentError');
-const {NotFoundError} = require('../errors/notFoundError');
+import {InvalidArgumentError} from '../errors/invalidArgumentError';
 
-const {Contract, ContractLog, ContractResult, TransactionResult, RecordFile, Transaction} = require('../model');
-const {ContractService, FileDataService, RecordFileService, TransactionService} = require('../service');
-const TransactionId = require('../transactionId');
-const utils = require('../utils');
-const {
+import {NotFoundError} from '../errors/notFoundError';
+
+import {Contract, ContractLog, ContractResult, TransactionResult, RecordFile, Transaction} from '../model';
+
+import {ContractService, FileDataService, RecordFileService, TransactionService} from '../service';
+import TransactionId from '../transactionId';
+import utils from '../utils';
+
+import {
   ContractViewModel,
   ContractLogViewModel,
   ContractResultViewModel,
   ContractResultDetailsViewModel,
-} = require('../viewmodel');
-const {httpStatusCodes} = require('../constants');
+} from '../viewmodel';
 
-const BaseController = require('./baseController');
-const Bound = require('./bound');
+import {httpStatusCodes} from '../constants';
+import BaseController from './baseController';
+import Bound from './bound';
 
 const contractSelectFields = [
   Contract.AUTO_RENEW_ACCOUNT_ID,
@@ -1101,7 +1099,7 @@ const exportControllerMethods = (methods = []) => {
   }, {});
 };
 
-module.exports = exportControllerMethods([
+export default exportControllerMethods([
   'getContractById',
   'getContracts',
   'getContractLogsById',

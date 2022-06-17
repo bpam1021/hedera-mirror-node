@@ -20,11 +20,10 @@
 
 'use strict';
 
-const _ = require('lodash');
-
-const {Nft} = require('../model');
-const BaseService = require('./baseService');
-const {OrderSpec} = require('../sql');
+import _ from 'lodash';
+import {Nft} from '../model';
+import BaseService from './baseService';
+import {OrderSpec} from '../sql';
 
 /**
  * Nft business model
@@ -111,4 +110,4 @@ class NftService extends BaseService {
   }
 }
 
-module.exports = new NftService();
+export default new NftService();

@@ -20,13 +20,11 @@
 
 'use strict';
 
-const {NftService} = require('../../service');
-const {assertSqlQueryEqual} = require('../testutils');
-
-const integrationDbOps = require('../integrationDbOps');
-const integrationDomainOps = require('../integrationDomainOps');
-
-const {defaultMochaStatements} = require('./defaultMochaStatements');
+import {NftService} from '../../service';
+import {assertSqlQueryEqual} from '../testutils';
+import integrationDbOps from '../integrationDbOps';
+import integrationDomainOps from '../integrationDomainOps';
+import {defaultMochaStatements} from './defaultMochaStatements';
 defaultMochaStatements(jest, integrationDbOps, integrationDomainOps);
 
 describe('NftService.getNftsFiltersQuery tests', () => {

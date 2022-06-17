@@ -21,7 +21,7 @@
 'use strict';
 
 const logger = require('log4js').getLogger();
-const matchers = require('jest-extended');
+import matchers from 'jest-extended';
 
 expect.extend(matchers); // add matchers from jest-extended
 jest.setTimeout(2000);

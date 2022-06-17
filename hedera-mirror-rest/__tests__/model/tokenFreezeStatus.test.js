@@ -20,7 +20,7 @@
 
 'use strict';
 
-const {TokenFreezeStatus} = require('../../model');
+import {TokenFreezeStatus} from '../../model';
 
 describe('TokenFreezeStatus', () => {
   describe('invalid id', () => {

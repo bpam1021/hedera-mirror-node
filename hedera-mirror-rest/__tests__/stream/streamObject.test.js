@@ -20,8 +20,8 @@
 
 'use strict';
 
-const {INT_SIZE, LONG_SIZE} = require('../../stream/constants');
-const StreamObject = require('../../stream/streamObject');
+import {INT_SIZE, LONG_SIZE} from '../../stream/constants';
+import StreamObject from '../../stream/streamObject';
 
 describe('StreamObject', () => {
   let buffer;
@@ -38,36 +38,36 @@ describe('StreamObject', () => {
     buffer.writeInt32BE(classVersion, LONG_SIZE);
   });
 
-  test('getLength', () => {
+  it('getLength', () => {
     const streamObject = new StreamObject(buffer);
     expect(streamObject.getHeaderLength()).toEqual(LONG_SIZE + INT_SIZE);
   });
 
-  test('getLength', () => {
+  it('getLength', () => {
     const streamObject = new StreamObject(buffer);
     expect(streamObject.getLength()).toEqual(LONG_SIZE + INT_SIZE);
   });
 
-  test('getHeaderLE', () => {
+  it('getHeaderLE', () => {
     const streamObject = new StreamObject(buffer);
     expect(streamObject.getHeaderLE()).toEqual(header);
   });
 
-  test('classId', () => {
+  it('classId', () => {
     const streamObject = new StreamObject(buffer);
     expect(streamObject.classId).toEqual(classId);
   });
 
-  test('classVersion', () => {
+  it('classVersion', () => {
     const streamObject = new StreamObject(buffer);
     expect(streamObject.classVersion).toEqual(classVersion);
   });
 
-  test('create from empty buffer', () => {
+  it('create from empty buffer', () => {
     expect(() => new StreamObject(Buffer.from([]))).toThrowErrorMatchingSnapshot();
   });
 
-  test('create from truncated buffer', () => {
+  it('create from truncated buffer', () => {
     expect(() => new StreamObject(Buffer.from([1, 2, 3, 4, 5]))).toThrowErrorMatchingSnapshot();
   });
 });

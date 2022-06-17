@@ -20,8 +20,8 @@
 
 'use strict';
 
-const {INT_SIZE, LONG_SIZE} = require('../../stream/constants');
-const SignatureObject = require('../../stream/signatureObject');
+import {INT_SIZE, LONG_SIZE} from '../../stream/constants';
+import SignatureObject from '../../stream/signatureObject';
 
 const {SHA_384_WITH_RSA} = SignatureObject;
 
@@ -44,42 +44,42 @@ describe('SignatureObject', () => {
     );
   });
 
-  test('getLength', () => {
+  it('getLength', () => {
     const expected = buffer.length;
     const signatureObject = new SignatureObject(buffer);
     expect(signatureObject.getLength()).toEqual(expected);
   });
 
-  test('classId', () => {
+  it('classId', () => {
     const signatureObject = new SignatureObject(buffer);
     expect(signatureObject.classId).toEqual(classId);
   });
 
-  test('classVersion', () => {
+  it('classVersion', () => {
     const signatureObject = new SignatureObject(buffer);
     expect(signatureObject.classVersion).toEqual(classVersion);
   });
 
-  test('signatureType', () => {
+  it('signatureType', () => {
     const signatureObject = new SignatureObject(buffer);
     expect(signatureObject.type).toEqual(SHA_384_WITH_RSA.type);
   });
 
-  test('signature', () => {
+  it('signature', () => {
     const signatureObject = new SignatureObject(buffer);
     expect(signatureObject.signature).toEqual(Buffer.from(signature));
   });
 
-  test('checksum mismatch', () => {
+  it('checksum mismatch', () => {
     buffer[LONG_SIZE + INT_SIZE + INT_SIZE] = 1;
     expect(() => new SignatureObject(buffer.slice(0, buffer.length - 4))).toThrowErrorMatchingSnapshot();
   });
 
-  test('truncated buffer', () => {
+  it('truncated buffer', () => {
     expect(() => new SignatureObject(buffer.slice(0, buffer.length - 4))).toThrowErrorMatchingSnapshot();
   });
 
-  test('unknown signatureType', () => {
+  it('unknown signatureType', () => {
     buffer[LONG_SIZE + INT_SIZE] = 1;
     expect(() => new SignatureObject(buffer)).toThrowErrorMatchingSnapshot();
   });

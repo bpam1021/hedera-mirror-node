@@ -18,11 +18,9 @@
  * ‍
  */
 
-'use strict';
-
-const appRoot = require('app-root-path');
-const fs = require('fs');
-const path = require('path');
+import appRoot from 'app-root-path';
+import fs from 'fs';
+import path from 'path';
 
 const recordStreamsPath = path.join(appRoot.toString(), '__tests__', 'data', 'recordstreams');
 const v2RecordStreamsPath = path.join(recordStreamsPath, 'v2');
@@ -259,8 +257,10 @@ const testRecordFileUnsupportedVersion = (versions, clazz) => {
 
   testSpecs.forEach((testSpec) => {
     const [version, buffer] = testSpec;
-    test(`create object from version ${version}`, () => {
-      expect(() => new clazz(buffer)).toThrowErrorMatchingSnapshot();
+    it(`create object from version ${version}`, () => {
+      expect(() => new clazz(buffer))
+        .to.throw()
+        .to.matchSnapshot();
     });
   });
 };
@@ -277,8 +277,8 @@ const testRecordFileCanCompact = (testSpecs, clazz) => {
     })
     .forEach((testSpec) => {
       const {version, buffer, expected} = testSpec;
-      test(`version ${version} - ${expected ? 'can compact' : 'cannot compact'}`, () => {
-        expect(clazz.canCompact(buffer)).toEqual(expected);
+      it(`version ${version} - ${expected ? 'can compact' : 'cannot compact'}`, () => {
+        expect(clazz.canCompact(buffer)).to.equal(expected);
       });
     });
 };
@@ -293,38 +293,46 @@ const testRecordFileFromBufferOrObj = (version, clazz, supportObj = false, hasRu
       const name = `from v${version} ${buffer ? 'buffer' : 'compact object'}`;
 
       checks.forEach((check) => {
-        test(`${name} - ${check.func} - ${JSON.stringify(check.args)}`, () => {
+        it(`${name} - ${check.func} - ${JSON.stringify(check.args)}`, () => {
           const recordFile = new clazz(bufferOrObj);
           const fn = recordFile[check.func];
           if (!check.expectErr) {
             const actual = fn.apply(recordFile, check.args);
-            expect(actual).toEqual(check.expected);
+            expect(actual).to.deep.equal(check.expected);
           } else {
-            expect(() => fn.apply(recordFile, check.args)).toThrowErrorMatchingSnapshot();
+            expect(() => fn.apply(recordFile, check.args))
+              .to.throw()
+              .to.matchSnapshot();
           }
         });
       });
     });
   });
 
-  test(`v${version} buffer with extra data`, () => {
+  it(`v${version} buffer with extra data`, () => {
     const buffer = Buffer.concat([getTestRecordFiles(version)[0].buffer, Buffer.from([0])]);
-    expect(() => new clazz(buffer)).toThrowErrorMatchingSnapshot();
+    expect(() => new clazz(buffer))
+      .to.throw()
+      .to.matchSnapshot();
   });
 
-  test(`truncated v${version} buffer`, () => {
+  it(`truncated v${version} buffer`, () => {
     const {buffer} = getTestRecordFiles(version)[0];
-    expect(() => new clazz(buffer.slice(0, buffer.length - 1))).toThrowErrorMatchingSnapshot();
+    expect(() => new clazz(buffer.slice(0, buffer.length - 1)))
+      .to.throw()
+      .to.matchSnapshot();
   });
 
   if (!supportObj) {
-    test('from non-Buffer obj', () => {
-      expect(() => new clazz({})).toThrowErrorMatchingSnapshot();
+    it('from non-Buffer obj', () => {
+      expect(() => new clazz({}))
+        .to.throw()
+        .to.matchSnapshot();
     });
   }
 
   if (hasRunningHash) {
-    test('end running hash mismatch', () => {
+    it('end running hash mismatch', () => {
       // make a shallow copy, change the last byte of the end running hash object
       const obj = {...getTestRecordFiles(version)[1].obj};
       const badEndRunningHashObject = Buffer.from(obj.endRunningHashObject);
@@ -332,12 +340,14 @@ const testRecordFileFromBufferOrObj = (version, clazz, supportObj = false, hasRu
       badEndRunningHashObject[lastIndex] = badEndRunningHashObject[lastIndex] ^ 0xff;
       obj.endRunningHashObject = badEndRunningHashObject;
 
-      expect(() => new clazz(obj)).toThrowErrorMatchingSnapshot();
+      expect(() => new clazz(obj))
+        .to.throw()
+        .to.matchSnapshot();
     });
   }
 };
 
-module.exports = {
+export default {
   testSignatureFiles,
   testRecordFileUnsupportedVersion,
   testRecordFileCanCompact,

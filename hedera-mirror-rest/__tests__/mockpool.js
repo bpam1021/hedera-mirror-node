@@ -20,15 +20,11 @@
 
 'use strict';
 
-const math = require('mathjs');
-const path = require('path');
-const EntityId = require('../entityId');
-const testutils = require('./testutils');
-const {
-  response: {
-    limit: {default: defaultLimit},
-  },
-} = require('../config');
+import math from 'mathjs';
+import path from 'path';
+import EntityId from '../entityId';
+import testutils from './testutils';
+import {response} from '../config';
 
 /**
  * This is a mock database for unit testing.
@@ -445,4 +441,4 @@ class Pool {
   }
 }
 
-module.exports = Pool;
+export default Pool;

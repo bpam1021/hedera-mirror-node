@@ -40,4 +40,4 @@ class OrderSpec {
   }
 }
 
-module.exports = OrderSpec;
+export default OrderSpec;

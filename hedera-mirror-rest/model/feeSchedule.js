@@ -18,11 +18,9 @@
  * ‍
  */
 
-'use strict';
-
-const _ = require('lodash');
-const {proto} = require('@hashgraph/proto');
-const {FileDecodeError} = require('../errors/fileDecodeError');
+import _ from 'lodash';
+import {proto} from '@hashgraph/proto';
+import errors from '../errors/fileDecodeError';
 
 class FeeSchedule {
   static FEE_DIVISOR_FACTOR = 1000;
@@ -35,7 +33,7 @@ class FeeSchedule {
     try {
       currentAndNextFeeSchedule = proto.CurrentAndNextFeeSchedule.decode(Buffer.from(feeSchedule.file_data, 'hex'));
     } catch (error) {
-      throw new FileDecodeError(error.message);
+      throw new errors.FileDecodeError(error.message);
     }
 
     this.current_feeSchedule = _.get(currentAndNextFeeSchedule, 'currentFeeSchedule.transactionFeeSchedule') || [];
@@ -44,4 +42,4 @@ class FeeSchedule {
   }
 }
 
-module.exports = FeeSchedule;
+export default FeeSchedule;

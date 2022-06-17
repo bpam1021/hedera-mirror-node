@@ -20,8 +20,8 @@
 
 'use strict';
 
-const EntityId = require('../entityId');
-const utils = require('../utils');
+import EntityId from '../entityId';
+import utils from '../utils';
 
 /**
  * BaseAllowance view model, captures the common fields of the allowance view model classes
@@ -42,4 +42,4 @@ class BaseAllowanceViewModel {
   }
 }
 
-module.exports = BaseAllowanceViewModel;
+export default BaseAllowanceViewModel;

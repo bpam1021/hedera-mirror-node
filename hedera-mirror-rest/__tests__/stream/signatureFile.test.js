@@ -20,24 +20,24 @@
 
 'use strict';
 
-const {BYTE_SIZE} = require('../../stream/constants');
-const {SHA_384} = require('../../stream/hashObject');
-const SignatureFile = require('../../stream/signatureFile');
-const {testSignatureFiles} = require('./testUtils');
+import {BYTE_SIZE} from '../../stream/constants';
+import {SHA_384} from '../../stream/hashObject';
+import SignatureFile from '../../stream/signatureFile';
+import {testSignatureFiles} from './testUtils';
 
 describe('from signature file buffer', () => {
   Object.entries(testSignatureFiles).forEach(([version, testSpec]) => {
-    test(version, () => {
+    it(version, () => {
       expect(new SignatureFile(testSpec.buffer)).toEqual(testSpec.expected);
     });
 
-    test(`${version} with extra data`, () => {
+    it(`${version} with extra data`, () => {
       const buffer = Buffer.alloc(testSpec.buffer.length + 1);
       testSpec.buffer.copy(buffer);
       expect(() => new SignatureFile(buffer)).toThrowErrorMatchingSnapshot();
     });
 
-    test(`${version} with truncated data`, () => {
+    it(`${version} with truncated data`, () => {
       const buffer = testSpec.buffer.slice(0, testSpec.buffer.length - 1);
       expect(() => new SignatureFile(buffer)).toThrowErrorMatchingSnapshot();
     });
@@ -45,7 +45,7 @@ describe('from signature file buffer', () => {
 
   describe('unsupported version', () => {
     [0, 1, 2, 3, 6].forEach((version) => {
-      test(`mark/version ${version}`, () => {
+      it(`mark/version ${version}`, () => {
         const buffer = Buffer.from(testSignatureFiles.v2.buffer);
         buffer.writeInt8(version);
         expect(() => new SignatureFile(buffer)).toThrowErrorMatchingSnapshot();
@@ -53,7 +53,7 @@ describe('from signature file buffer', () => {
     });
   });
 
-  test('incorrect signature mark', () => {
+  it('incorrect signature mark', () => {
     const buffer = Buffer.from(testSignatureFiles.v2.buffer);
     buffer.writeInt8(16, BYTE_SIZE + SHA_384.length);
     expect(() => new SignatureFile(buffer)).toThrowErrorMatchingSnapshot();

@@ -20,12 +20,12 @@
 
 'use strict';
 
-const log4js = require('log4js');
-const AWSMock = require('aws-sdk-mock');
-const querystring = require('querystring');
-const {createS3Client} = require('../s3client');
-const config = require('../config');
-const {cloudProviders, defaultCloudProviderEndpoints} = require('../constants');
+import log4js from 'log4js';
+import AWSMock from 'aws-sdk-mock';
+import querystring from 'querystring';
+import {createS3Client} from '../s3client';
+import config from '../config';
+import {cloudProviders, defaultCloudProviderEndpoints} from '../constants';
 
 // create a minimal global logger for createS3Client to log errors.
 global.logger = log4js.getLogger();

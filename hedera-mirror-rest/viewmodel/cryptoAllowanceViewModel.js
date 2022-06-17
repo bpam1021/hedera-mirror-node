@@ -20,7 +20,7 @@
 
 'use strict';
 
-const BaseAllowanceViewModel = require('./baseAllowanceViewModel');
+import BaseAllowanceViewModel from './baseAllowanceViewModel';
 
 /**
  * CryptoAllowance view model
@@ -37,4 +37,4 @@ class CryptoAllowanceViewModel extends BaseAllowanceViewModel {
   }
 }
 
-module.exports = CryptoAllowanceViewModel;
+export default CryptoAllowanceViewModel;

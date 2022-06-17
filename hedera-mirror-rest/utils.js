@@ -20,29 +20,28 @@
 
 'use strict';
 
-const _ = require('lodash');
-const anonymize = require('ip-anonymize');
-const crypto = require('crypto');
-const JSONBig = require('json-bigint')({useNativeBigInt: true});
-const long = require('long');
-const math = require('mathjs');
-const pg = require('pg');
-const util = require('util');
+import _ from 'lodash';
+import anonymize from 'ip-anonymize';
+import crypto from 'crypto';
+import JSONBigFactory from 'json-bigint';
+import long from 'long';
+import math from 'mathjs';
+import pg from 'pg';
+import pgRange from 'pg-range';
+import util from 'util';
 
-const constants = require('./constants');
-const EntityId = require('./entityId');
-const config = require('./config');
-const ed25519 = require('./ed25519');
-const contants = require('./constants');
-const {DbError} = require('./errors/dbError');
-const {InvalidArgumentError} = require('./errors/invalidArgumentError');
-const {InvalidClauseError} = require('./errors/invalidClauseError');
-const {TransactionResult, TransactionType, FeeSchedule} = require('./model');
-const {keyTypes} = require('./constants');
-const pgRange = require('pg-range');
+import config from './config.js';
+import * as constants from './constants.js';
+import ed25519 from './ed25519';
+import EntityId from './entityId.js';
+import errors from './errors/index.js';
+import model from './model/index.js';
+import {keyTypes} from './constants';
+
+const JSONBig = JSONBigFactory({useNativeBigInt: true});
 
 const responseLimit = config.response.limit;
-const resultSuccess = TransactionResult.getSuccessProtoId();
+const resultSuccess = model.TransactionResult.getSuccessProtoId();
 
 const opsMap = {
   lt: ' < ',
@@ -361,7 +360,7 @@ const filterDependencyCheck = (query) => {
   }
 
   if (badParams.length) {
-    throw InvalidArgumentError.forRequestValidation(badParams);
+    throw errors.InvalidArgumentError.forRequestValidation(badParams);
   }
 };
 
@@ -402,7 +401,7 @@ const validateReq = (req) => {
   }
 
   if (badParams.length > 0) {
-    throw InvalidArgumentError.forRequestValidation(badParams);
+    throw errors.InvalidArgumentError.forRequestValidation(badParams);
   }
 };
 
@@ -517,7 +516,7 @@ const parseParams = (paramValues, processValue, processQuery, allowMultiple) => 
 
 const validateClauseAndValues = (clause, values) => {
   if ((clause.match(/\?/g) || []).length !== values.length) {
-    throw new InvalidClauseError(`Invalid clause produced after parsing query parameters: number of replacement
+    throw new errors.InvalidClauseError(`Invalid clause produced after parsing query parameters: number of replacement
     parameters does not equal number of values: clause: \"${clause}\", values: ${values}`);
   }
 };
@@ -980,7 +979,7 @@ const buildAndValidateFilters = (
   badParams.push(...additionalBadParams);
 
   if (badParams.length > 0) {
-    throw InvalidArgumentError.forRequestValidation(badParams);
+    throw errors.InvalidArgumentError.forRequestValidation(badParams);
   }
 
   if (filterDependencyChecker) {
@@ -1236,7 +1235,7 @@ const getPoolClass = (mock = false) => {
       if (client !== undefined) {
         await client.query('rollback');
       }
-      throw new DbError(err.message);
+      throw new errors.DbError(err.message);
     } finally {
       if (client !== undefined) {
         client.off('error', clientErrorCallback);
@@ -1257,7 +1256,7 @@ const getPoolClass = (mock = false) => {
 const checkTimestampRange = (timestampFilters) => {
   //No timestamp params provided
   if (timestampFilters.length === 0) {
-    throw new InvalidArgumentError('No timestamp range or eq operator provided');
+    throw new errors.InvalidArgumentError('No timestamp range or eq operator provided');
   }
 
   const valuesByOp = {};
@@ -1269,22 +1268,22 @@ const checkTimestampRange = (timestampFilters) => {
 
   if (valuesByOp[opsMap.ne].length > 0) {
     // Don't allow ne
-    throw new InvalidArgumentError('Not equals operator not supported for timestamp param');
+    throw new errors.InvalidArgumentError('Not equals operator not supported for timestamp param');
   }
 
   if (gtGteLength > 1) {
     //Don't allow multiple gt/gte
-    throw new InvalidArgumentError('Multiple gt or gte operators not permitted for timestamp param');
+    throw new errors.InvalidArgumentError('Multiple gt or gte operators not permitted for timestamp param');
   }
 
   if (ltLteLength > 1) {
     //Don't allow multiple lt/lte
-    throw new InvalidArgumentError('Multiple lt or lte operators not permitted for timestamp param');
+    throw new errors.InvalidArgumentError('Multiple lt or lte operators not permitted for timestamp param');
   }
 
   if (valuesByOp[opsMap.eq].length > 0 && (gtGteLength > 0 || ltLteLength > 0)) {
     //Combined eq with other operator
-    throw new InvalidArgumentError('Cannot combine eq with gt, gte, lt, or lte for timestamp param');
+    throw new errors.InvalidArgumentError('Cannot combine eq with gt, gte, lt, or lte for timestamp param');
   }
 
   if (valuesByOp[opsMap.eq].length > 0) {
@@ -1294,7 +1293,7 @@ const checkTimestampRange = (timestampFilters) => {
 
   if (gtGteLength === 0 || ltLteLength === 0) {
     //Missing range
-    throw new InvalidArgumentError('Timestamp range must have gt (or gte) and lt (or lte)');
+    throw new errors.InvalidArgumentError('Timestamp range must have gt (or gte) and lt (or lte)');
   }
 
   // there should be exactly one gt/gte and one lt/lte at this point
@@ -1305,7 +1304,7 @@ const checkTimestampRange = (timestampFilters) => {
   const difference = latest - earliest + 1n;
 
   if (difference > config.maxTimestampRangeNs || difference <= 0n) {
-    throw new InvalidArgumentError(
+    throw new errors.InvalidArgumentError(
       `Timestamp lower and upper bounds must be positive and within ${config.maxTimestampRange}`
     );
   }
@@ -1368,38 +1367,43 @@ const convertGasPriceToTinyBars = (gasPrice, hbarsPerTinyCent, centsPerHbar) => 
   return Math.round(Math.max(tinyBars, 1));
 };
 
-module.exports = {
+export {
   addHexPrefix,
   buildAndValidateFilters,
   buildComparatorFilter,
+  buildFilters,
   buildPgSqlObject,
   checkTimestampRange,
   conflictingPathParam,
-  createTransactionId,
+  convertGasPriceToTinyBars,
   convertMySqlStyleQueryToPostgres,
+  createTransactionId,
   encodeBase64,
   encodeBinary,
-  encodeUtf8,
   encodeKey,
+  encodeUtf8,
   filterDependencyCheck,
   filterValidityChecks,
+  formatComparator,
+  formatFilters,
+  getLimitParamValue,
+  getNextParamQueries,
   getNullableNumber,
   getPaginationLink,
   getPoolClass,
   gtGte,
   ipMask,
   isNonNegativeInt32,
-  isRepeatedQueryParameterValidLength,
-  isTestEnv,
   isPositiveLong,
   isRegexMatch,
+  isRepeatedQueryParameterValidLength,
+  isTestEnv,
+  isValidBlockHash,
   isValidEthHash,
-  isValidPublicKeyQuery,
   isValidOperatorQuery,
-  isValidValueIgnoreCase,
+  isValidPublicKeyQuery,
   isValidTimestampParam,
-  JSONParse: JSONBig.parse,
-  JSONStringify: JSONBig.stringify,
+  isValidValueIgnoreCase,
   ltLte,
   mergeParams,
   nsToSecNs,
@@ -1409,6 +1413,7 @@ module.exports = {
   parseBalanceQueryParam,
   parseBooleanValue,
   parseCreditDebitParams,
+  parseInteger,
   parseLimitAndOrderParams,
   parseParams,
   parsePublicKey,
@@ -1425,22 +1430,9 @@ module.exports = {
   toHexString,
   toHexStringNonQuantity,
   toHexStringQuantity,
+  validateAndParseFilters,
+  validateFilters,
   validateReq,
-  isValidBlockHash,
-  convertGasPriceToTinyBars,
 };
 
-if (isTestEnv()) {
-  Object.assign(module.exports, {
-    buildFilters,
-    formatComparator,
-    formatFilters,
-    getLimitParamValue,
-    getNextParamQueries,
-    getPaginationLink,
-    parseInteger,
-    validateAndParseFilters,
-    validateFilters,
-    convertGasPriceToTinyBars,
-  });
-}
+export const {parse: JSONParse, stringify: JSONStringify} = JSONBig;

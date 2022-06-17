@@ -20,18 +20,17 @@
 
 'use strict';
 
-const _ = require('lodash');
-
-const config = require('./config');
-const constants = require('./constants');
-const EntityId = require('./entityId');
-const s3client = require('./s3client');
-const {CompositeRecordFile} = require('./stream');
-const TransactionId = require('./transactionId');
-const utils = require('./utils');
-const {DbError} = require('./errors/dbError');
-const {NotFoundError} = require('./errors/notFoundError');
-const {FileDownloadError} = require('./errors/fileDownloadError');
+import _ from 'lodash';
+import config from './config';
+import constants from './constants';
+import EntityId from './entityId';
+import s3client from './s3client';
+import {CompositeRecordFile} from './stream';
+import TransactionId from './transactionId';
+import utils from './utils';
+import {DbError} from './errors/dbError';
+import {NotFoundError} from './errors/notFoundError';
+import {FileDownloadError} from './errors/fileDownloadError';
 
 /**
  * Get the consensus_timestamp of the transaction. Throws exception if no such successful transaction found or multiple such
@@ -337,7 +336,7 @@ const getStateProofForTransaction = async (req, res) => {
   };
 };
 
-module.exports = {
+export default {
   getStateProofForTransaction,
 };
 

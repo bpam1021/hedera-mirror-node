@@ -18,9 +18,7 @@
  * ‍
  */
 
-'use strict';
-
-const HashObject = require('../../stream/hashObject');
+import HashObject from '../../stream/hashObject.js';
 
 describe('HashObject', () => {
   let buffer;
@@ -41,33 +39,33 @@ describe('HashObject', () => {
     );
   });
 
-  test('getLength', () => {
+  it('getLength', () => {
     const expected = buffer.length;
     const hashObject = new HashObject(buffer);
     expect(hashObject.getLength()).toEqual(expected);
   });
 
-  test('classId', () => {
+  it('classId', () => {
     const hashObject = new HashObject(buffer);
     expect(hashObject.classId).toEqual(classId);
   });
 
-  test('classVersion', () => {
+  it('classVersion', () => {
     const hashObject = new HashObject(buffer);
     expect(hashObject.classVersion).toEqual(classVersion);
   });
 
-  test('digestType', () => {
+  it('digestType', () => {
     const hashObject = new HashObject(buffer);
     expect(hashObject.digestType).toEqual(digestType);
   });
 
-  test('hash', () => {
+  it('hash', () => {
     const hashObject = new HashObject(buffer);
     expect(hashObject.hash).toEqual(Buffer.from(hash));
   });
 
-  test('truncated buffer', () => {
+  it('truncated buffer', () => {
     expect(() => new HashObject(buffer.slice(0, buffer.length - 4))).toThrowErrorMatchingSnapshot();
   });
 });

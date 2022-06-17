@@ -20,9 +20,10 @@
 
 'use strict';
 
-const {FileDecodeError} = require('../../errors/fileDecodeError');
+import {FileDecodeError} from '../../errors/fileDecodeError';
+
 // models
-const {ExchangeRate} = require('../../model');
+import {ExchangeRate} from '../../model';
 
 describe('exchange rate proto parse', () => {
   const input = {

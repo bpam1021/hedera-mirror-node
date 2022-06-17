@@ -20,10 +20,10 @@
 
 'use strict';
 
-const EntityId = require('../entityId');
-const utils = require('../utils');
-const {TransactionType} = require('../model');
-const _ = require('lodash');
+import EntityId from '../entityId';
+import utils from '../utils';
+import {TransactionType} from '../model';
+import _ from 'lodash';
 
 /**
  * Nft transaction history transfer view model
@@ -43,4 +43,4 @@ class NftTransactionHistoryViewModel {
   }
 }
 
-module.exports = NftTransactionHistoryViewModel;
+export default NftTransactionHistoryViewModel;

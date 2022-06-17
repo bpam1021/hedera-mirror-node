@@ -20,8 +20,8 @@
 
 'use strict';
 
-const EntityId = require('../entityId');
-const utils = require('../utils');
+import EntityId from '../entityId';
+import utils from '../utils';
 
 /**
  * Contract view model
@@ -60,4 +60,4 @@ class ContractViewModel {
   }
 }
 
-module.exports = ContractViewModel;
+export default ContractViewModel;

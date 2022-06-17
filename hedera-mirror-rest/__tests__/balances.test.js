@@ -20,11 +20,11 @@
 
 'use strict';
 
-const log4js = require('log4js');
-const request = require('supertest');
-const server = require('../server');
-const testutils = require('./testutils.js');
-const config = require('../config.js');
+import log4js from 'log4js';
+import request from 'supertest';
+import server from '../server';
+import testutils from './testutils.js';
+import config from '../config.js';
 
 const logger = log4js.getLogger();
 const timeNow = Math.floor(new Date().getTime() / 1000);

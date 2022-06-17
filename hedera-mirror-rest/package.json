@@ -1,6 +1,7 @@
 {
   "name": "@hashgraph/mirror-rest",
   "version": "0.59.0-SNAPSHOT",
+  "type": "module",
   "description": "Hedera Mirror Node REST API",
   "main": "server.js",
   "private": true,
@@ -8,11 +9,11 @@
     "node": ">=16.13.0 < 17"
   },
   "scripts": {
-    "dev": "nodemon app.js",
+    "dev": "nodemon server.js",
     "integrationtest": "jest --testPathPattern='/__tests__/integration.test.js|/__tests__/service/.*\\.test\\.js' --collectCoverage=false",
     "lint": "eslint --ignore-pattern node_modules/ --fix .",
     "postinstall": "node ./npm_scripts/postinstall.js",
-    "test": "jest --testPathPattern='__tests__/.*\\.test\\.js'"
+    "test": "mocha __tests__/**/*.test.js"
   },
   "author": "Hedera Mirror Node Team",
   "license": "Apache-2.0",
@@ -84,6 +85,7 @@
     "app-root-path": "^3.0.0",
     "aws-sdk-mock": "^5.7.0",
     "axios": "^0.27.2",
+    "chai": "^4.3.6",
     "codecov": "^3.8.3",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.5.0",
@@ -93,10 +95,11 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-security": "^1.5.0",
     "husky": "^8.0.1",
-    "jest": "^28.1.1",
     "jest-circus": "^28.1.1",
     "jest-extended": "^2.0.0",
     "jest-junit": "^13.2.0",
+    "mocha": "^10.0.0",
+    "mocha-chai-jest-snapshot": "^1.1.4",
     "mock-req-res": "^1.2.0",
     "node-flywaydb": "^3.0.7",
     "nodemon": "^2.0.16",
@@ -106,7 +109,8 @@
     "rewire": "^6.0.0",
     "sinon": "^14.0.0",
     "supertest": "^6.2.3",
-    "testcontainers": "^8.10.1"
+    "testcontainers": "^8.10.1",
+    "ts-node": "^10.8.1"
   },
   "jest": {
     "collectCoverage": true,

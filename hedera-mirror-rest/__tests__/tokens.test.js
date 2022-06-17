@@ -20,17 +20,13 @@
 
 'use strict';
 
-const tokens = require('../tokens');
-const {filterKeys, orderFilterValues} = require('../constants');
-const {
-  response: {
-    limit: {default: defaultLimit},
-  },
-} = require('../config');
-const {opsMap} = require('../utils');
-const utils = require('../utils');
-const {assertSqlQueryEqual} = require('./testutils');
-const constants = require('../constants');
+import tokens from '../tokens';
+import {filterKeys, orderFilterValues} from '../constants';
+import {response} from '../config';
+import {opsMap} from '../utils';
+import utils from '../utils';
+import {assertSqlQueryEqual} from './testutils';
+import constants from '../constants';
 
 describe('token formatTokenRow tests', () => {
   const rowInput = {

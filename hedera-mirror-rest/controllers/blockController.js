@@ -20,21 +20,16 @@
 
 'use strict';
 
-const _ = require('lodash');
-
-const RecordFile = require('../model/recordFile');
-const BaseController = require('./baseController');
-const {RecordFileService} = require('../service');
-const {BlockViewModel} = require('../viewmodel');
-const utils = require('../utils');
-const constants = require('../constants');
-const {NotFoundError} = require('../errors/notFoundError');
-const {InvalidArgumentError} = require('../errors/invalidArgumentError');
-const {
-  response: {
-    limit: {default: defaultLimit, max: maxLimit},
-  },
-} = require('../config');
+import _ from 'lodash';
+import RecordFile from '../model/recordFile';
+import BaseController from './baseController';
+import {RecordFileService} from '../service';
+import {BlockViewModel} from '../viewmodel';
+import utils from '../utils';
+import constants from '../constants';
+import {NotFoundError} from '../errors/notFoundError';
+import {InvalidArgumentError} from '../errors/invalidArgumentError';
+import {response} from '../config';
 
 const validateHashOrNumber = (hashOrNumber) => {
   if (utils.isValidBlockHash(hashOrNumber)) {
@@ -132,4 +127,4 @@ class BlockController extends BaseController {
   };
 }
 
-module.exports = new BlockController();
+export default new BlockController();

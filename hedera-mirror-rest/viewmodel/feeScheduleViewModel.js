@@ -20,12 +20,10 @@
 
 'use strict';
 
-const _ = require('lodash');
-const {
-  proto: {HederaFunctionality},
-} = require('@hashgraph/proto');
-const utils = require('../utils');
-const constants = require('../constants');
+import _ from 'lodash';
+import {proto} from '@hashgraph/proto';
+import utils from '../utils';
+import constants from '../constants';
 
 /**
  * Fee schedule view model
@@ -82,4 +80,4 @@ class FeeScheduleViewModel {
   }
 }
 
-module.exports = FeeScheduleViewModel;
+export default FeeScheduleViewModel;

@@ -20,14 +20,10 @@
 
 'use strict';
 
-const {
-  response: {
-    limit: {default: defaultLimit},
-  },
-} = require('../../config');
-const constants = require('../../constants');
-const accountCtrl = require('../../controllers/accountController');
-const utils = require('../../utils');
+import {response} from '../../config';
+import constants from '../../constants';
+import accountCtrl from '../../controllers/accountController';
+import utils from '../../utils';
 
 const accountIdFilter = 'account_id = $1';
 const tokenIdFilter = 'token_id = $2';

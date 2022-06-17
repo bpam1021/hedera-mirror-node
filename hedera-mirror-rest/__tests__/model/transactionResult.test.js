@@ -20,10 +20,10 @@
 
 'use strict';
 
-const {proto} = require('@hashgraph/proto');
+import {proto} from '@hashgraph/proto';
 
 // models
-const {TransactionResult} = require('../../model');
+import {TransactionResult} from '../../model';
 
 describe('transactionResult constants are up to date', () => {
   describe('Name to ID', () => {

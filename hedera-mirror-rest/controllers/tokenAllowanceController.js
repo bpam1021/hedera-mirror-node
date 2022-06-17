@@ -20,24 +20,17 @@
 
 'use strict';
 
-const _ = require('lodash');
-
-const {
-  response: {
-    limit: {default: defaultLimit},
-  },
-} = require('../config');
-const constants = require('../constants');
-const utils = require('../utils');
-
-const BaseController = require('./baseController');
-const Bound = require('./bound');
-
-const {EntityService, TokenAllowanceService} = require('../service');
-const {TokenAllowanceViewModel} = require('../viewmodel');
+import _ from 'lodash';
+import {response} from '../config';
+import constants from '../constants';
+import utils from '../utils';
+import BaseController from './baseController';
+import Bound from './bound';
+import {EntityService, TokenAllowanceService} from '../service';
+import {TokenAllowanceViewModel} from '../viewmodel';
 
 // errors
-const {InvalidArgumentError} = require('../errors/invalidArgumentError');
+import {InvalidArgumentError} from '../errors/invalidArgumentError';
 
 class TokenAllowanceController extends BaseController {
   /**
@@ -223,4 +216,4 @@ class TokenAllowanceController extends BaseController {
   }
 }
 
-module.exports = new TokenAllowanceController();
+export default new TokenAllowanceController();

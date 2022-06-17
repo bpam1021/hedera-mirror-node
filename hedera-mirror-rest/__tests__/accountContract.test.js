@@ -18,50 +18,48 @@
  * ‍
  */
 
-'use strict';
-
-const accountContract = require('../accountContract');
-const {assertSqlQueryEqual} = require('./testutils');
+import {accountFields, contractFields, getAccountContractUnionQueryWithOrder} from '../accountContract.js';
+import {assertSqlQueryEqual} from './testutils.js';
 
 describe('getAccountContractUnionQueryWithOrder', () => {
-  test('no order options', () => {
+  it('no order options', () => {
     assertSqlQueryEqual(
-      accountContract.getAccountContractUnionQueryWithOrder(),
+      getAccountContractUnionQueryWithOrder(),
       `
     (
-      select ${accountContract.accountFields}
+      select ${accountFields}
       from entity
       where type = 'ACCOUNT'
     )
     union all
     (
-      select ${accountContract.contractFields}
+      select ${contractFields}
       from contract
     )`
     );
   });
 
-  test('one order option', () => {
+  it('one order option', () => {
     assertSqlQueryEqual(
-      accountContract.getAccountContractUnionQueryWithOrder({field: 'id', order: 'desc'}),
+      getAccountContractUnionQueryWithOrder({field: 'id', order: 'desc'}),
       `
     (
-      select ${accountContract.accountFields}
+      select ${accountFields}
       from entity
       where type = 'ACCOUNT'
       order by id desc
     )
     union all
     (
-      select ${accountContract.contractFields}
+      select ${contractFields}
       from contract
       order by id desc
     )`
     );
   });
 
-  test('two order options', () => {
-    const actual = accountContract.getAccountContractUnionQueryWithOrder(
+  it('two order options', () => {
+    const actual = getAccountContractUnionQueryWithOrder(
       {field: 'id', order: 'asc'},
       {field: 'created_timestamp', order: 'desc'}
     );
@@ -69,14 +67,14 @@ describe('getAccountContractUnionQueryWithOrder', () => {
       actual,
       `
     (
-      select ${accountContract.accountFields}
+      select ${accountFields}
       from entity
       where type = 'ACCOUNT'
       order by id asc, created_timestamp desc
     )
     union all
     (
-      select ${accountContract.contractFields}
+      select ${contractFields}
       from contract
       order by id asc, created_timestamp desc
     )`

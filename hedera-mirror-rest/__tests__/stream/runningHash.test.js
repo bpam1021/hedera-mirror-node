@@ -18,12 +18,12 @@
  * ‍
  */
 
-'use strict';
+import HashObject from '../../stream/hashObject.js';
+import calculateRunningHash from '../../stream/runningHash.js';
 
-const {SHA_384} = require('../../stream/hashObject');
-const {calculateRunningHash} = require('../../stream/runningHash');
+const {SHA_384} = HashObject;
 
-test('calculateRunningHash', () => {
+it('calculateRunningHash', () => {
   const header = Buffer.from([0xde, 0xad, 0xbe, 0xef]);
   const runningHashObject = {
     header,
@@ -35,5 +35,5 @@ test('calculateRunningHash', () => {
   };
   const expected = Buffer.from('mIgXt6GDsWO8SQYe78oWPrPFRlfX0H+6+cn7Smn19ByLOjwd+J3GQCPRyPG1cuQw', 'base64');
 
-  expect(calculateRunningHash(runningHashObject, nextHashObject, SHA_384.name)).toEqual(expected);
+  expect(calculateRunningHash(runningHashObject, nextHashObject, SHA_384.name)).to.equal(expected);
 });

@@ -20,7 +20,7 @@
 
 'use strict';
 
-module.exports = {
+export default {
   AccountController: require('./accountController'),
   ContractController: require('./contractController'),
   CryptoAllowanceController: require('./cryptoAllowanceController'),

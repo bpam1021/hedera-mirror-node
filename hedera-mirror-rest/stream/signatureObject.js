@@ -18,11 +18,9 @@
  * ‍
  */
 
-'use strict';
-
-const {BYTE_SIZE, INT_SIZE} = require('./constants');
-const StreamObject = require('./streamObject');
-const {readLengthAndBytes} = require('./utils');
+import {BYTE_SIZE, INT_SIZE} from './constants.js';
+import StreamObject from './streamObject.js';
+import {readLengthAndBytes} from './utils.js';
 
 class SignatureObject extends StreamObject {
   // properties of SHA384WithRsa signature
@@ -55,4 +53,4 @@ class SignatureObject extends StreamObject {
   }
 }
 
-module.exports = SignatureObject;
+export default SignatureObject;

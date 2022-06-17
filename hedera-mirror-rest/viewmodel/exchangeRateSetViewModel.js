@@ -20,8 +20,8 @@
 
 'use strict';
 
-const utils = require('../utils');
-const ExchangeRateViewModel = require('./exchangeRateViewModel');
+import utils from '../utils';
+import ExchangeRateViewModel from './exchangeRateViewModel';
 
 /**
  * Exchange rate set view model
@@ -42,4 +42,4 @@ class ExchangeRateSetViewModel {
   }
 }
 
-module.exports = ExchangeRateSetViewModel;
+export default ExchangeRateSetViewModel;

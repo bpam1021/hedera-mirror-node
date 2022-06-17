@@ -18,19 +18,13 @@
  * ‍
  */
 
-'use strict';
+import request from 'supertest';
 
-const _ = require('lodash');
-const log4js = require('log4js');
-const request = require('supertest');
-
-const {getAccountAliasQuery, getBalanceParamValue, processRow} = require('../accounts');
-const base32 = require('../base32');
-const constants = require('../constants');
-const server = require('../server');
-const testutils = require('./testutils');
-
-const logger = log4js.getLogger();
+import accounts from '../accounts.js';
+import base32 from '../base32.js';
+import * as constants from '../constants.js';
+import server from '../server.js';
+import * as testutils from './testutils.js';
 
 // Validation functions
 /**
@@ -403,7 +397,7 @@ describe('processRow', () => {
   };
 
   test('with balance', () => {
-    expect(processRow(inputAccount)).toEqual(expectedAccount);
+    expect(accounts.processRow(inputAccount)).toEqual(expectedAccount);
   });
 
   test('undefined balance', () => {
@@ -417,7 +411,7 @@ describe('processRow', () => {
       ...expectedAccount,
       balance: null,
     };
-    expect(processRow(inputBalanceUndefined)).toEqual(expectedNoBalance);
+    expect(accounts.processRow(inputBalanceUndefined)).toEqual(expectedNoBalance);
   });
 
   test('null balance', () => {
@@ -435,30 +429,30 @@ describe('processRow', () => {
         tokens: [],
       },
     };
-    expect(processRow(inputNullBalance)).toEqual(expectedNullBalance);
+    expect(accounts.processRow(inputNullBalance)).toEqual(expectedNullBalance);
   });
 
   test('null auto_renew_period', () => {
-    expect(processRow({...inputAccount, auto_renew_period: null})).toEqual({
+    expect(accounts.processRow({...inputAccount, auto_renew_period: null})).toEqual({
       ...expectedAccount,
       auto_renew_period: null,
     });
   });
 
   test('null key', () => {
-    expect(processRow({...inputAccount, key: null})).toEqual({...expectedAccount, key: null});
+    expect(accounts.processRow({...inputAccount, key: null})).toEqual({...expectedAccount, key: null});
   });
 
   test('null alias', () => {
-    expect(processRow({...inputAccount, alias: null})).toEqual({...expectedAccount, alias: null});
+    expect(accounts.processRow({...inputAccount, alias: null})).toEqual({...expectedAccount, alias: null});
   });
 
   test('default contract', () => {
-    expect(processRow(inputContract)).toEqual(expectedContract);
+    expect(accounts.processRow(inputContract)).toEqual(expectedContract);
   });
 
   test('contract with parsable evm address', () => {
-    expect(processRow({...inputContract, evm_address: null})).toEqual({
+    expect(accounts.processRow({...inputContract, evm_address: null})).toEqual({
       ...expectedContract,
       evm_address: '0x00000000000000000000000000000000000004e2',
     });
@@ -468,18 +462,18 @@ describe('processRow', () => {
 describe('getBalanceParamValue', () => {
   const key = constants.filterKeys.BALANCE;
   test('default', () => {
-    expect(getBalanceParamValue({})).toBeTrue();
+    expect(accounts.getBalanceParamValue({})).toBeTrue();
   });
   test('single value true', () => {
-    expect(getBalanceParamValue({[key]: 'true'})).toBeTrue();
+    expect(accounts.getBalanceParamValue({[key]: 'true'})).toBeTrue();
   });
   test('single value false', () => {
-    expect(getBalanceParamValue({[key]: 'false'})).toBeFalse();
+    expect(accounts.getBalanceParamValue({[key]: 'false'})).toBeFalse();
   });
   test('array last value true', () => {
-    expect(getBalanceParamValue({[key]: ['false', 'true']})).toBeTrue();
+    expect(accounts.getBalanceParamValue({[key]: ['false', 'true']})).toBeTrue();
   });
   test('array last value false', () => {
-    expect(getBalanceParamValue({[key]: ['true', 'false']})).toBeFalse();
+    expect(accounts.getBalanceParamValue({[key]: ['true', 'false']})).toBeFalse();
   });
 });

@@ -20,10 +20,10 @@
 
 'use strict';
 
-const long = require('long');
-const {proto} = require('@hashgraph/proto');
-const TransactionId = require('../../transactionId');
-const utils = require('../../stream/utils');
+import long from 'long';
+import {proto} from '@hashgraph/proto';
+import TransactionId from '../../transactionId';
+import utils from '../../stream/utils';
 
 describe('protoTransactionIdToTransactionId', () => {
   const accountID = {
@@ -66,7 +66,7 @@ describe('protoTransactionIdToTransactionId', () => {
   ];
 
   testSpecs.forEach((testSpec) => {
-    test(`expect output ${testSpec.expected}`, () => {
+    it(`expect output ${testSpec.expected}`, () => {
       expect(utils.protoTransactionIdToTransactionId(testSpec.transactionId)).toEqual(testSpec.expected);
     });
   });
@@ -143,7 +143,7 @@ describe('readLengthAndBytes', () => {
 
   testSpecs.forEach((testSpec) => {
     const {name, buffer, minLength, maxLength, hasChecksum, expected} = testSpec;
-    test(name, () => {
+    it(name, () => {
       if (expected) {
         const actual = utils.readLengthAndBytes(buffer, minLength, maxLength, hasChecksum);
         expect(actual).toEqual(expected);
@@ -190,7 +190,7 @@ describe('readNBytes', () => {
   ];
 
   testSpecs.forEach((testSpec) => {
-    test(testSpec.name, () => {
+    it(testSpec.name, () => {
       if (testSpec.expected) {
         expect(utils.readNBytes(testSpec.buffer, testSpec.length)).toEqual(testSpec.expected);
       } else {

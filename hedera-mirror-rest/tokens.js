@@ -20,30 +20,27 @@
 
 'use strict';
 
-const {
-  response: {
-    limit: {default: defaultLimit},
-  },
-} = require('./config');
-const constants = require('./constants');
-const EntityId = require('./entityId');
-const utils = require('./utils');
+import {response} from './config';
+import constants from './constants';
+import EntityId from './entityId';
+import utils from './utils';
 
 // errors
-const {InvalidArgumentError} = require('./errors/invalidArgumentError');
-const {NotFoundError} = require('./errors/notFoundError');
+import {InvalidArgumentError} from './errors/invalidArgumentError';
+
+import {NotFoundError} from './errors/notFoundError';
 
 // models
-const {CustomFee, Entity, Nft, NftTransfer, Token, Transaction} = require('./model');
+import {CustomFee, Entity, Nft, NftTransfer, Token, Transaction} from './model';
 
 // middleware
-const {httpStatusCodes} = require('./constants');
+import {httpStatusCodes} from './constants';
 
 // services
-const {NftService, TokenService} = require('./service');
+import {NftService, TokenService} from './service';
 
 // view models
-const {CustomFeeViewModel, NftViewModel, NftTransactionHistoryViewModel} = require('./viewmodel');
+import {CustomFeeViewModel, NftViewModel, NftTransactionHistoryViewModel} from './viewmodel';
 
 // select columns
 const sqlQueryColumns = {
@@ -963,7 +960,7 @@ const getNftTransferHistoryRequest = async (req, res) => {
   }
 };
 
-module.exports = {
+export default {
   getNftTokenInfoRequest,
   getNftTokensRequest,
   getNftTransferHistoryRequest,

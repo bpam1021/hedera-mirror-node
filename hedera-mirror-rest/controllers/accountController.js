@@ -20,22 +20,16 @@
 
 'use strict';
 
-const _ = require('lodash');
-
-const {
-  response: {
-    limit: {default: defaultLimit},
-  },
-} = require('../config');
-const constants = require('../constants');
-const utils = require('../utils');
-
-const {Nft} = require('../model');
-const {EntityService, NftService} = require('../service');
-const {NftViewModel} = require('../viewmodel');
+import _ from 'lodash';
+import {response} from '../config';
+import constants from '../constants';
+import utils from '../utils';
+import {Nft} from '../model';
+import {EntityService, NftService} from '../service';
+import {NftViewModel} from '../viewmodel';
 
 // errors
-const {InvalidArgumentError} = require('../errors/invalidArgumentError');
+import {InvalidArgumentError} from '../errors/invalidArgumentError';
 
 const tokenSerialLowerRequirementMessage =
   'A lower bound serialnumber filter requires a lower bound tokenId parameter filter';
@@ -368,7 +362,7 @@ const getNftsByAccountId = async (req, res) => {
   res.locals[constants.responseDataLabel] = response;
 };
 
-module.exports = {
+export default {
   getNftsByAccountId,
 };
 

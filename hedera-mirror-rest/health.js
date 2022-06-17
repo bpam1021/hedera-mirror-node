@@ -18,14 +18,9 @@
  * ‍
  */
 
-'use strict';
+import errors from './errors/index.js';
 
-const {DbError} = require('./errors/dbError');
-const {NotFoundError} = require('./errors/notFoundError');
-
-const readinessQuery = `select true
-                        from address_book
-                        limit 1;`;
+const readinessQuery = `select true from address_book limit 1;`;
 
 /**
  * Function to determine readiness of application.
@@ -33,16 +28,10 @@ const readinessQuery = `select true
  * @returns {Promise<void>}
  */
 const readinessCheck = async () => {
-  return pool
-    .query(readinessQuery)
-    .catch((err) => {
-      throw new DbError(err.message);
-    })
-    .then((results) => {
-      if (results.rowCount !== 1) {
-        throw new NotFoundError('Application readiness check failed');
-      }
-    });
+  const result = await pool.queryQuietly(readinessQuery);
+  if (result.rowCount !== 1) {
+    throw new errors.NotFoundError('Application readiness check failed');
+  }
 };
 
 /**
@@ -62,7 +51,7 @@ const beforeShutdown = async () => {
   return pool.end();
 };
 
-module.exports = {
+export default {
   readinessCheck,
   livenessCheck,
   beforeShutdown,

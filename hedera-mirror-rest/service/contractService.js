@@ -20,23 +20,19 @@
 
 'use strict';
 
-const _ = require('lodash');
+import _ from 'lodash';
+import constants from '../constants';
+import Contract from '../model/contract';
 
-const constants = require('../constants');
-const Contract = require('../model/contract');
-const {ContractLog, ContractResult, ContractStateChange, Transaction, EthereumTransaction} = require('../model');
-const {
-  response: {
-    limit: {default: defaultLimit},
-  },
-} = require('../config');
-const EntityId = require('../entityId');
-const {NotFoundError} = require('../errors/notFoundError');
-const {orderFilterValues} = require('../constants');
-const {OrderSpec} = require('../sql');
-const {JSONStringify} = require('../utils');
+import {ContractLog, ContractResult, ContractStateChange, Transaction, EthereumTransaction} from '../model';
 
-const BaseService = require('./baseService');
+import {response} from '../config';
+import EntityId from '../entityId';
+import {NotFoundError} from '../errors/notFoundError';
+import {orderFilterValues} from '../constants';
+import {OrderSpec} from '../sql';
+import {JSONStringify} from '../utils';
+import BaseService from './baseService';
 
 /**
  * Contract retrieval business logic
@@ -351,4 +347,4 @@ class ContractService extends BaseService {
   }
 }
 
-module.exports = new ContractService();
+export default new ContractService();

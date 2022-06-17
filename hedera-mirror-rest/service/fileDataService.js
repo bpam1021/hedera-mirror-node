@@ -20,11 +20,10 @@
 
 'use strict';
 
-const _ = require('lodash');
-
-const BaseService = require('./baseService');
-const {Contract, ExchangeRate, FileData, FeeSchedule} = require('../model');
-const utils = require('../utils');
+import _ from 'lodash';
+import BaseService from './baseService';
+import {Contract, ExchangeRate, FileData, FeeSchedule} from '../model';
+import utils from '../utils';
 
 /**
  * File data retrieval business logic
@@ -121,4 +120,4 @@ class FileDataService extends BaseService {
   };
 }
 
-module.exports = new FileDataService();
+export default new FileDataService();

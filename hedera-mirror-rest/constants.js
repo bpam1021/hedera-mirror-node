@@ -18,8 +18,6 @@
  * ‍
  */
 
-'use strict';
-
 const MAX_INT32 = 2147483647;
 
 // url query filer keys
@@ -200,7 +198,7 @@ const queryParamOperatorPatterns = {
   ne: /^!=$/,
 };
 
-module.exports = {
+export {
   MAX_INT32,
   characterEncoding,
   cloudProviders,

@@ -18,15 +18,17 @@
  * ‍
  */
 
-'use strict';
+import extend from 'extend';
+import fs from 'fs';
+import yaml from 'js-yaml';
+import parseDuration from 'parse-duration';
+import path from 'path';
+import * as url from 'url';
 
-const extend = require('extend');
-const fs = require('fs');
-const yaml = require('js-yaml');
-const parseDuration = require('parse-duration');
-const path = require('path');
-const {InvalidConfigError} = require('./errors/invalidConfigError');
-const {cloudProviders, networks, defaultBucketNames} = require('./constants');
+import errors from './errors/index.js';
+import {cloudProviders, networks, defaultBucketNames} from './constants.js';
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const defaultConfigName = 'application';
 const config = {};
@@ -126,7 +128,7 @@ function parseDbPoolConfig() {
     const value = pool[configKey];
     const parsed = parseInt(value, 10);
     if (Number.isNaN(parsed) || parsed <= 0) {
-      throw new InvalidConfigError(`invalid value set for db.pool.${configKey}: ${value}`);
+      throw new errors.InvalidConfigError(`invalid value set for db.pool.${configKey}: ${value}`);
     }
     pool[configKey] = parsed;
   });
@@ -140,7 +142,7 @@ function parseStateProofStreamsConfig() {
 
   const {streams: streamsConfig} = stateproof;
   if (!Object.values(networks).includes(streamsConfig.network)) {
-    throw new InvalidConfigError(`unknown network ${streamsConfig.network}`);
+    throw new errors.InvalidConfigError(`unknown network ${streamsConfig.network}`);
   }
 
   if (!streamsConfig.bucketName) {
@@ -149,11 +151,11 @@ function parseStateProofStreamsConfig() {
 
   if (!streamsConfig.bucketName) {
     // the default for network 'OTHER' is null, throw err if it's not configured
-    throw new InvalidConfigError('stateproof.streams.bucketName must be set');
+    throw new errors.InvalidConfigError('stateproof.streams.bucketName must be set');
   }
 
   if (!Object.values(cloudProviders).includes(streamsConfig.cloudProvider)) {
-    throw new InvalidConfigError(`unsupported object storage service provider ${streamsConfig.cloudProvider}`);
+    throw new errors.InvalidConfigError(`unsupported object storage service provider ${streamsConfig.cloudProvider}`);
   }
 }
 
@@ -161,7 +163,7 @@ const parseMaxTimestampRange = () => {
   const conf = getConfig();
   const ms = parseDuration(conf.maxTimestampRange);
   if (!ms) {
-    throw new InvalidConfigError(`invalid maxTimestampRange ${conf.maxTimestampRange}`);
+    throw new errors.InvalidConfigError(`invalid maxTimestampRange ${conf.maxTimestampRange}`);
   }
   conf.maxTimestampRangeNs = BigInt(ms) * 1000000n;
 };
@@ -179,4 +181,4 @@ if (!loaded) {
   loaded = true;
 }
 
-module.exports = getConfig();
+export default getConfig();

@@ -20,7 +20,7 @@
 
 'use strict';
 
-const utils = require('../utils');
+import utils from '../utils';
 
 /**
  * Block view model
@@ -48,4 +48,4 @@ class BlockViewModel {
   }
 }
 
-module.exports = BlockViewModel;
+export default BlockViewModel;

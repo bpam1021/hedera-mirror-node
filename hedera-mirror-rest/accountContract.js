@@ -18,10 +18,6 @@
  * ‍
  */
 
-'use strict';
-
-const utils = require('./utils');
-
 const commonFields = [
   'auto_renew_period',
   'created_timestamp',
@@ -69,13 +65,4 @@ const getAccountContractUnionQueryWithOrder = (...orderOptions) => {
   `;
 };
 
-module.exports = {
-  getAccountContractUnionQueryWithOrder,
-};
-
-if (utils.isTestEnv()) {
-  Object.assign(module.exports, {
-    accountFields,
-    contractFields,
-  });
-}
+export {accountFields, contractFields, getAccountContractUnionQueryWithOrder};

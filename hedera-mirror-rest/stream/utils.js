@@ -18,11 +18,9 @@
  * ‍
  */
 
-'use strict';
-
-const log4js = require('log4js');
-const {INT_SIZE} = require('./constants');
-const TransactionId = require('../transactionId');
+import log4js from 'log4js';
+import {INT_SIZE} from './constants.js';
+import TransactionId from '../transactionId.js';
 
 const logger = log4js.getLogger();
 
@@ -96,9 +94,4 @@ const readNBytes = (buffer, length) => {
   return buffer.slice(0, length);
 };
 
-module.exports = {
-  logger,
-  protoTransactionIdToTransactionId,
-  readLengthAndBytes,
-  readNBytes,
-};
+export {logger, protoTransactionIdToTransactionId, readLengthAndBytes, readNBytes};

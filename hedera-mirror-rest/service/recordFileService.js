@@ -20,10 +20,9 @@
 
 'use strict';
 
-const _ = require('lodash');
-
-const BaseService = require('./baseService');
-const {RecordFile} = require('../model');
+import _ from 'lodash';
+import BaseService from './baseService';
+import {RecordFile} from '../model';
 
 const buildWhereSqlStatement = (whereQuery) => {
   let where = '';
@@ -157,4 +156,4 @@ class RecordFileService extends BaseService {
   }
 }
 
-module.exports = new RecordFileService();
+export default new RecordFileService();

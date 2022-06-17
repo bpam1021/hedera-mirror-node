@@ -20,20 +20,20 @@
 
 'use strict';
 
-const _ = require('lodash');
-const log4js = require('log4js');
-const {mockRequest, mockResponse} = require('mock-req-res');
-const {Readable} = require('stream');
-const rewire = require('rewire');
-const sinon = require('sinon');
-const constants = require('../constants');
-const config = require('../config');
-const s3client = require('../s3client');
-const stateproof = require('../stateproof');
-const {CompositeRecordFile} = require('../stream');
-const TransactionId = require('../transactionId');
-const EntityId = require('../entityId');
-const {opsMap} = require('../utils');
+import _ from 'lodash';
+import log4js from 'log4js';
+import {mockRequest, mockResponse} from 'mock-req-res';
+import {Readable} from 'stream';
+import rewire from 'rewire';
+import sinon from 'sinon';
+import constants from '../constants';
+import config from '../config';
+import s3client from '../s3client';
+import stateproof from '../stateproof';
+import {CompositeRecordFile} from '../stream';
+import TransactionId from '../transactionId';
+import EntityId from '../entityId';
+import {opsMap} from '../utils';
 
 const logger = log4js.getLogger();
 // need to set the globals here so when __set__ them with rewire it won't throw ReferenceError 'xxx is not defined'

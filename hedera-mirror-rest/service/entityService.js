@@ -20,17 +20,14 @@
 
 'use strict';
 
-const _ = require('lodash');
-
-const BaseService = require('./baseService');
-const {Contract, Entity} = require('../model');
-
-const constants = require('../constants');
-const AccountAlias = require('../accountAlias');
-const EntityId = require('../entityId');
-
-const {InvalidArgumentError} = require('../errors/invalidArgumentError');
-const {NotFoundError} = require('../errors/notFoundError');
+import _ from 'lodash';
+import BaseService from './baseService';
+import {Contract, Entity} from '../model';
+import constants from '../constants';
+import AccountAlias from '../accountAlias';
+import EntityId from '../entityId';
+import {InvalidArgumentError} from '../errors/invalidArgumentError';
+import {NotFoundError} from '../errors/notFoundError';
 
 /**
  * Entity retrieval business logic
@@ -171,4 +168,4 @@ class EntityService extends BaseService {
   }
 }
 
-module.exports = new EntityService();
+export default new EntityService();

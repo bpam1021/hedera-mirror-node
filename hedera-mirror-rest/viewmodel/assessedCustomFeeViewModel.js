@@ -20,7 +20,7 @@
 
 'use strict';
 
-const EntityId = require('../entityId');
+import EntityId from '../entityId';
 
 /**
  * Assessed custom fee view model
@@ -46,4 +46,4 @@ class AssessedCustomFeeViewModel {
   }
 }
 
-module.exports = AssessedCustomFeeViewModel;
+export default AssessedCustomFeeViewModel;

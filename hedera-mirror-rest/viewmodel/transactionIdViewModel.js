@@ -20,11 +20,10 @@
 
 'use strict';
 
-const _ = require('lodash');
-
-const EntityId = require('../entityId');
-const {proto} = require('@hashgraph/proto');
-const utils = require('../utils');
+import _ from 'lodash';
+import EntityId from '../entityId';
+import {proto} from '@hashgraph/proto';
+import utils from '../utils';
 
 /**
  * TransactionId view model
@@ -55,4 +54,4 @@ class TransactionIdViewModel {
   }
 }
 
-module.exports = TransactionIdViewModel;
+export default TransactionIdViewModel;
