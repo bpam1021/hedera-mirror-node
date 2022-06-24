@@ -34,6 +34,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.apache.commons.codec.binary.Base64;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.springframework.data.domain.Persistable;
@@ -115,4 +116,115 @@ public class Transaction implements Persistable<Long> {
     public boolean isNew() {
         return true; // Since we never update and use a natural ID, avoid Hibernate querying before insert
     }
+
+    @JsonIgnore
+    public String toJsonPartial(String designator) {
+        if (designator.equalsIgnoreCase("entityId")) {
+            return "" + entityId.getEntityNum();
+        } else if (designator.equalsIgnoreCase("transactionType")) {
+            return TransactionType.of(type).name();
+        } else if (designator.equalsIgnoreCase("fields")) {
+            final String prefix = "      \"";
+            final String equals = "\":";
+            final String equalsString = "\":\"";
+            final String comma = ",\n";
+            final String commaString = "\",\n";
+            StringBuilder sb = new StringBuilder()
+                .append("{\n")
+                .append(prefix)
+                .append("payer_account_id")
+                .append(equalsString)
+                .append(payerAccountId.toString())
+                .append(commaString)
+                .append(prefix)
+                .append("node")
+                .append(equalsString)
+                .append(nodeAccountId.toString())
+                .append(commaString)
+                .append(prefix)
+                .append("valid_start_ns")
+                .append(equalsString)
+                .append(validStartNs)
+                .append(commaString)
+                .append(prefix)
+                .append("valid_duration_seconds")
+                .append(equalsString)
+                .append(validDurationSeconds)
+                .append(commaString)
+                .append(prefix)
+                .append("initial_balance")
+                .append(equalsString)
+                .append(initialBalance)
+                .append(commaString)
+                .append(prefix)
+                .append("max_fee")
+                .append(equalsString)
+                .append(maxFee)
+                .append(commaString)
+                .append(prefix)
+                .append("charged_tx_fee")
+                .append(equalsString)
+                .append(chargedTxFee)
+                .append(commaString)
+                .append(prefix)
+                .append("memo")
+                .append(equalsString)
+                .append(Base64.encodeBase64String(memo))
+                .append(commaString)
+                .append(prefix)
+                .append("transaction_hash")
+                .append(equalsString)
+                .append(Base64.encodeBase64String(transactionHash))
+                .append(commaString)
+                .append(prefix)
+                .append("transaction_id")
+                .append(equalsString)
+                .append(getId())
+                .append(commaString)
+                .append(prefix)
+                .append("transaction_bytes")
+                .append(equalsString)
+                .append(Base64.encodeBase64String(transactionBytes))
+                .append(commaString)
+                .append(prefix)
+                .append("scheduled")
+                .append(equalsString)
+                .append(Boolean.toString(scheduled))
+                .append(commaString)
+                .append(prefix)
+                .append("nonce")
+                .append(equalsString)
+                .append(nonce)
+                .append(commaString)
+                .append(prefix)
+                .append("parent_consensus_timestamp")
+                .append(equalsString)
+                .append(parentConsensusTimestamp)
+                .append(commaString)
+                .append(prefix)
+                .append("errata")
+                .append(equalsString)
+                .append(errata == null ? "" : errata.name())
+                .append(commaString)
+                .append(prefix)
+                .append("result")
+                .append(equalsString)
+                .append(result)
+                .append("\"\n    }");
+            return sb.toString();
+        } else {
+            return "\"Unknown designator\":\"" + designator + "\"";
+        }
+    }
+
+    @JsonIgnore
+    public Integer toJsonPartialInteger(String designator) {
+        if (designator.equalsIgnoreCase("index")) {
+            return index;
+        } else {
+            // log an exception?
+            return -1;
+        }
+    }
+
 }

@@ -37,7 +37,10 @@ services:
       - ./application.yml:/usr/etc/hedera-mirror-grpc/application.yml
 
   importer:
-    image: gcr.io/mirrornode/hedera-mirror-importer:main
+    # image: gcr.io/mirrornode/hedera-mirror-importer:main
+    build:
+      context: ./hedera-mirror-importer
+      dockerfile: Dockerfile
     pull_policy: always
     restart: unless-stopped
     environment:
@@ -46,6 +49,7 @@ services:
       SPRING_REDIS_HOST: redis
     volumes:
       - ./application.yml:/usr/etc/hedera-mirror-importer/application.yml
+      - ./tempDir:/app/tempDir
 
   monitor:
     deploy:

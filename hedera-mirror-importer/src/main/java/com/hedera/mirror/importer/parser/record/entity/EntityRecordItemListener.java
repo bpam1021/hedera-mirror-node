@@ -252,7 +252,7 @@ public class EntityRecordItemListener implements RecordItemListener {
         log.debug("Storing transaction: {}", transaction);
     }
 
-    private Transaction buildTransaction(long consensusTimestamp, RecordItem recordItem) {
+    public static Transaction buildTransaction(long consensusTimestamp, RecordItem recordItem) {
         TransactionBody body = recordItem.getTransactionBody();
         TransactionRecord txRecord = recordItem.getRecord();
 
@@ -262,8 +262,12 @@ public class EntityRecordItemListener implements RecordItemListener {
         var nodeAccount = EntityId.of(body.getNodeAccountID());
         var transactionId = body.getTransactionID();
 
+        // use the most common entityId fetcher from multiple TransactionHandlers.
+        EntityId entityId =  EntityId.of(recordItem.getRecord().getReceipt().getAccountID());
+
         // build transaction
         Transaction transaction = new Transaction();
+        transaction.setEntityId(entityId);
         transaction.setChargedTxFee(txRecord.getTransactionFee());
         transaction.setConsensusTimestamp(consensusTimestamp);
         transaction.setIndex(recordItem.getTransactionIndex());
@@ -275,8 +279,11 @@ public class EntityRecordItemListener implements RecordItemListener {
         transaction.setPayerAccountId(recordItem.getPayerAccountId());
         transaction.setResult(txRecord.getReceipt().getStatusValue());
         transaction.setScheduled(txRecord.hasScheduleRef());
+        /* MYK 
         transaction.setTransactionBytes(entityProperties.getPersist().isTransactionBytes() ?
                 recordItem.getTransactionBytes() : null);
+        MYK -- replaced with */
+        transaction.setTransactionBytes(recordItem.getTransactionBytes());
         transaction.setTransactionHash(DomainUtils.toBytes(txRecord.getTransactionHash()));
         transaction.setType(recordItem.getTransactionType());
         transaction.setValidDurationSeconds(validDurationSeconds);
