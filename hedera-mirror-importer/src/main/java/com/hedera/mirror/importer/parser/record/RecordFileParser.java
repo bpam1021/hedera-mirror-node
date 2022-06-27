@@ -30,8 +30,10 @@ import com.hedera.mirror.common.util.DomainUtils;
 import com.hedera.mirror.importer.parser.record.entity.EntityRecordItemListener;
 
 import com.hederahashgraph.api.proto.java.AccountAmount;
+import com.hederahashgraph.api.proto.java.NftTransfer;
 import com.hederahashgraph.api.proto.java.TokenAssociateTransactionBody;
 import com.hederahashgraph.api.proto.java.TokenID;
+import com.hederahashgraph.api.proto.java.TokenTransferList;
 import com.hederahashgraph.api.proto.java.TransactionBody;
 import com.hederahashgraph.api.proto.java.TransactionRecord;
 import com.hederahashgraph.api.proto.java.TransferList;
@@ -231,99 +233,136 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
         appendStringToJsonArray("    ", "entityId", t.toJsonPartial("entityId"), true);
         appendStringToJsonArray("    ", "type", t.toJsonPartial("transactionType"), true);
         appendIntegerToJsonArray("    ", "index", t.toJsonPartialInteger("index"), true);
+        appendIntegerToJsonArray("    ", "result", t.toJsonPartialInteger("result"), true);
+        appendStringToJsonArray("    ", "scheduled", t.toJsonPartial("scheduled"), true);
+        appendIntegerToJsonArray("    ", "nonce", t.toJsonPartialInteger("nonce"), true);
+        appendStringToJsonArray("    ", "transaction_id", t.toJsonPartial("transactionId"), true);
         appendJsonToJsonArray("    ", "fields", t.toJsonPartial("fields"), true);
         appendLongToJsonArray("    ", "consensus_timestamp", t.getId(), true);
-        String transactionsArray = buildTransactionsJsonArray(recordItem, tr, t);
-        if (transactionsArray.length() > 1) {
-            appendJsonToJsonArray("    ", "transactions", transactionsArray, true);
+        String tokenTransfers = buildTokenTransfersJsonArray(recordItem, tr, t);
+        if (tokenTransfers.length() > 1) {
+            appendJsonToJsonArray("    ", "transfers_tokens", tokenTransfers, true);
         }
-        jsonArray.append("}\n");  // no commas between records, and no final "]"
+        String hbarTransfers = buildHbarTransfersJsonArray(recordItem, tr, t);
+        if (hbarTransfers.length() > 1) {
+            appendJsonToJsonArray("    ", "transfers_hbar", hbarTransfers, true);
+        }
+        String nftTransfers = buildNftTransfersJsonArray(recordItem, tr, t);
+        if (nftTransfers.length() > 1) {
+            appendJsonToJsonArray("    ", "transfers_nft", nftTransfers, true);
+        }
+        // remove the trailing comma from this record
+        jsonArray.setLength(jsonArray.length() - 2);
+        jsonArray.append("\n    }\n");  // no commas between records, and no final "]"
     }
 
-    private String buildTransactionsJsonArray(RecordItem recordItem, TransactionRecord tr, Transaction t) {
-        TransactionBody body = recordItem.getTransactionBody();
-        boolean isTokenDissociate = body.hasTokenDissociate();
-        long consensusTimestamp = DomainUtils.timeStampInNanos(tr.getConsensusTimestamp());
+    private String buildTokenTransfersJsonArray(RecordItem recordItem, TransactionRecord tr, Transaction t) {
         StringBuilder output = new StringBuilder();
+        boolean atLeastOneTokenFound = false;
 
-        tr.getTokenTransferListsList().forEach(tokenTransferList -> {
-            output.append("      {\n");
-            // to.do: assessed_custom_fees arrays
-            // to.do: bytes?
-            // to.do: charged_tx_fee
-            output.append("        \"consensus_timestamp\":\"");
-            output.append(consensusTimestamp);
-            output.append("\",\n");
-            // to.do: entity_id
-            // to.do: max_fee
-            // to.do: memo_base64
-            // to.do: name
-            // to.do: nft_transfers array // NFTs
-            // to.do: node
-            // to.do: nonce
-            // to.do: parent_consensus_timestamp
-            // to.do: result
-            // to.do: scheduled
-            // to.do: transaction_hash
-            // to.do: transaction_id
-            // to.do SECOND: transfers // hbar tokens
-            // to.do: valid_duration_seconds
-            // to.do: valid_start_timestamp
-            // to.do FIRST: token_transfers // fungable tokens
+        for (TokenTransferList tokenTransferList : tr.getTokenTransferListsList()) {
             TokenID tokenId = tokenTransferList.getToken();
             EntityId entityTokenId = EntityId.of(tokenId);
             EntityId payerAccountId = recordItem.getPayerAccountId();
             List<AccountAmount> tokenTransfers = tokenTransferList.getTransfersList();
             int tokenTransferCount = tokenTransfers.size();
-            StringBuilder tokenTransfersJson = new StringBuilder();
             for (int tokenTransferCounter = 0; tokenTransferCounter < tokenTransferCount; tokenTransferCounter++) {
+                if (atLeastOneTokenFound) {
+                    output.append(",");
+                } else {
+                    output.append("[\n");
+                    atLeastOneTokenFound = true;
+                }
                 AccountAmount accountAmount = tokenTransfers.get(tokenTransferCounter);
                 EntityId accountId = EntityId.of(accountAmount.getAccountID());
                 long amount = accountAmount.getAmount();
                 boolean isApproval = accountAmount.getIsApproval();
-                tokenTransfersJson.append("          {\n");
-                tokenTransfersJson.append("            \"account\":\"" + accountId.toString() + "\",\n");
-                tokenTransfersJson.append("            \"account_shard\":\"" + accountId.getShardNum() + "\",\n");
-                tokenTransfersJson.append("            \"account_realm\":\"" + accountId.getRealmNum() + "\",\n");
-                tokenTransfersJson.append("            \"account_number\":\"" + accountId.getEntityNum() + "\",\n");
-                tokenTransfersJson.append("            \"amount\":" + amount + ",\n");
-                tokenTransfersJson.append("            \"is_approval\":" + isApproval + "\n");
-                tokenTransfersJson.append("          }");
-                if (tokenTransferCounter < tokenTransferCount - 1) {
-                    tokenTransfersJson.append(",");
-                }
-                tokenTransfersJson.append("\n");
+                output.append("          {\n");
+                output.append("            \"account\":\"" + accountId.toString() + "\",\n");
+                output.append("            \"account_shard\":\"" + accountId.getShardNum() + "\",\n");
+                output.append("            \"account_realm\":\"" + accountId.getRealmNum() + "\",\n");
+                output.append("            \"account_number\":\"" + accountId.getEntityNum() + "\",\n");
+                output.append("            \"amount\":" + amount + ",\n");
+                output.append("            \"is_approval\":" + isApproval + "\n");
+                output.append("          }\n");
             }
-            if (tokenTransfersJson.length() > 1) {
-                output.append("        \"token_transfers\":[\n");
-                output.append(tokenTransfersJson.toString());
-                output.append("        ],\n");
-            }
-        });
+        }
+        if (output.length() > 0) {
+            output.append("      ]\n");
+        }
+        return output.toString();
+    }
+
+    private String buildHbarTransfersJsonArray(RecordItem recordItem, TransactionRecord tr, Transaction t) {
+        StringBuilder output = new StringBuilder();
+
         TransferList transferList = tr.getTransferList();
         int transferCount = transferList.getAccountAmountsCount();
         if (transferCount > 0) {
-                output.append("      {\n");
-                output.append("        \"transfers\":[\n");
-                for (int i = 0; i < transferCount; ++i) {
-                    var aa = transferList.getAccountAmounts(i);
-                    EntityId account = EntityId.of(aa.getAccountID());
-                    boolean isApproval = aa.getIsApproval();
-                    output.append("          {\n");
-                    output.append("            \"account\":\"" + account.toString() + "\",\n");
-                    output.append("            \"account_shard\":\"" + account.getShardNum() + "\",\n");
-                    output.append("            \"account_realm\":\"" + account.getRealmNum() + "\",\n");
-                    output.append("            \"account_number\":\"" + account.getEntityNum() + "\",\n");
-                    output.append("            \"amount\":" + aa.getAmount() + ",\n");
-                    output.append("            \"is_approval\":" + isApproval + "\n");
-                    output.append("          }");
-                    if (i < transferCount - 1) {
-                        output.append(",");
-                    }
-                    output.append("\n");
+            output.append("        [\n");
+            for (int i = 0; i < transferCount; ++i) {
+                var aa = transferList.getAccountAmounts(i);
+                EntityId account = EntityId.of(aa.getAccountID());
+                boolean isApproval = aa.getIsApproval();
+                output.append("          {\n");
+                output.append("            \"account\":\"" + account.toString() + "\",\n");
+                output.append("            \"account_shard\":\"" + account.getShardNum() + "\",\n");
+                output.append("            \"account_realm\":\"" + account.getRealmNum() + "\",\n");
+                output.append("            \"account_number\":\"" + account.getEntityNum() + "\",\n");
+                output.append("            \"amount\":" + aa.getAmount() + ",\n");
+                output.append("            \"is_approval\":" + isApproval + "\n");
+                output.append("          }");
+                if (i < transferCount - 1) {
+                    output.append(",");
                 }
-                output.append("        ],\n");
-                output.append("      }\n");
+                output.append("\n");
+            }
+            output.append("        ],\n");
+        }
+        return output.toString();
+    }
+
+    private String buildNftTransfersJsonArray(RecordItem recordItem, TransactionRecord tr, Transaction t) {
+        StringBuilder output = new StringBuilder();
+        boolean atLeastOneTokenFound = false;
+        for (TokenTransferList tokenTransferList : tr.getTokenTransferListsList()) {
+            TokenID tokenId = tokenTransferList.getToken();
+            EntityId entityTokenId = EntityId.of(tokenId);
+            EntityId payerAccountId = recordItem.getPayerAccountId();
+            List<NftTransfer> nftTransfers = tokenTransferList.getNftTransfersList();
+            int nftTransferCount = nftTransfers.size();
+            for (int nftTransferCounter = 0; nftTransferCounter < nftTransferCount; nftTransferCounter++) {
+                if (atLeastOneTokenFound) {
+                    output.append(",");
+                } else {
+                    output.append("[\n");
+                    atLeastOneTokenFound = true;
+                }
+                NftTransfer nftTransfer = nftTransfers.get(nftTransferCounter);
+                EntityId receiverId = EntityId.of(nftTransfer.getReceiverAccountID());
+                EntityId senderId = EntityId.of(nftTransfer.getSenderAccountID());
+                long serialNumber = nftTransfer.getSerialNumber();
+                boolean isApproval = nftTransfer.getIsApproval();
+                output.append("          {\n");
+                output.append("            \"payer_account\":\"" + payerAccountId.toString() + "\",\n");
+                output.append("            \"payer_account_shard\":\"" + payerAccountId.getShardNum() + "\",\n");
+                output.append("            \"payer_account_realm\":\"" + payerAccountId.getRealmNum() + "\",\n");
+                output.append("            \"payer_account_number\":\"" + payerAccountId.getEntityNum() + "\",\n");
+                output.append("            \"sender_account\":\"" + senderId.toString() + "\",\n");
+                output.append("            \"sender_account_shard\":\"" + senderId.getShardNum() + "\",\n");
+                output.append("            \"sender_account_realm\":\"" + senderId.getRealmNum() + "\",\n");
+                output.append("            \"sender_account_number\":\"" + senderId.getEntityNum() + "\",\n");
+                output.append("            \"receiver_account\":\"" + receiverId.toString() + "\",\n");
+                output.append("            \"receiver_account_shard\":\"" + receiverId.getShardNum() + "\",\n");
+                output.append("            \"receiver_account_realm\":\"" + receiverId.getRealmNum() + "\",\n");
+                output.append("            \"receiver_account_number\":\"" + receiverId.getEntityNum() + "\",\n");
+                output.append("            \"serial_number\":" + serialNumber + ",\n");
+                output.append("            \"is_approval\":" + isApproval + "\n");
+                output.append("          }\n");
+            }
+        };
+        if (output.length() > 0) {
+            output.append("      ]\n");
         }
         return output.toString();
     }

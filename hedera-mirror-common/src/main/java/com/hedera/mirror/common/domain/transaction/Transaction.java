@@ -121,8 +121,16 @@ public class Transaction implements Persistable<Long> {
     public String toJsonPartial(String designator) {
         if (designator.equalsIgnoreCase("entityId")) {
             return "" + entityId.getEntityNum();
+        } else if (designator.equalsIgnoreCase("scheduled")) {
+            return Boolean.toString(scheduled);
         } else if (designator.equalsIgnoreCase("transactionType")) {
             return TransactionType.of(type).name();
+        } else if (designator.equalsIgnoreCase("transactionId")) {
+            long microsToSecond = 1000000L;
+            long seconds = validStartNs / microsToSecond;
+            long nanos = (validStartNs % microsToSecond) * 1000L;
+            // MYK -- to be determined -- append scheduled and nonce to this?
+            return payerAccountId.toString() + "-" + seconds + "-" + nanos;
         } else if (designator.equalsIgnoreCase("fields")) {
             final String prefix = "      \"";
             final String equals = "\":";
@@ -177,24 +185,9 @@ public class Transaction implements Persistable<Long> {
                 .append(Base64.encodeBase64String(transactionHash))
                 .append(commaString)
                 .append(prefix)
-                .append("transaction_id")
-                .append(equalsString)
-                .append(getId())
-                .append(commaString)
-                .append(prefix)
                 .append("transaction_bytes")
                 .append(equalsString)
                 .append(Base64.encodeBase64String(transactionBytes))
-                .append(commaString)
-                .append(prefix)
-                .append("scheduled")
-                .append(equalsString)
-                .append(Boolean.toString(scheduled))
-                .append(commaString)
-                .append(prefix)
-                .append("nonce")
-                .append(equalsString)
-                .append(nonce)
                 .append(commaString)
                 .append(prefix)
                 .append("parent_consensus_timestamp")
@@ -205,11 +198,6 @@ public class Transaction implements Persistable<Long> {
                 .append("errata")
                 .append(equalsString)
                 .append(errata == null ? "" : errata.name())
-                .append(commaString)
-                .append(prefix)
-                .append("result")
-                .append(equalsString)
-                .append(result)
                 .append("\"\n    }");
             return sb.toString();
         } else {
@@ -221,6 +209,10 @@ public class Transaction implements Persistable<Long> {
     public Integer toJsonPartialInteger(String designator) {
         if (designator.equalsIgnoreCase("index")) {
             return index;
+        } else if (designator.equalsIgnoreCase("nonce")) {
+            return nonce;
+        } else if (designator.equalsIgnoreCase("result")) {
+            return result;
         } else {
             // log an exception?
             return -1;
