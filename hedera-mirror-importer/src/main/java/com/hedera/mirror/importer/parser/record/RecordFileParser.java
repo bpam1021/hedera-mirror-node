@@ -30,7 +30,12 @@ import com.hedera.mirror.common.util.DomainUtils;
 import com.hedera.mirror.importer.parser.record.entity.EntityRecordItemListener;
 
 import com.hederahashgraph.api.proto.java.AccountAmount;
+import com.hederahashgraph.api.proto.java.ContractFunctionResult;
+import com.hederahashgraph.api.proto.java.ContractID;
+import com.hederahashgraph.api.proto.java.ContractLoginfo;
+import com.hederahashgraph.api.proto.java.ContractStateChange;
 import com.hederahashgraph.api.proto.java.NftTransfer;
+import com.hederahashgraph.api.proto.java.StorageChange;
 import com.hederahashgraph.api.proto.java.TokenAssociateTransactionBody;
 import com.hederahashgraph.api.proto.java.TokenID;
 import com.hederahashgraph.api.proto.java.TokenTransferList;
@@ -48,6 +53,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Named;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.Level;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -251,6 +257,24 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
         if (nftTransfers.length() > 1) {
             appendJsonToJsonArray("    ", "transfers_nft", nftTransfers, true);
         }
+
+        ContractFunctionResult contractResult = getContractFunctionResult(tr);
+        EntityId payerAccountId = recordItem.getPayerAccountId();
+        if (contractResult != null) {
+            String contractLogs = buildContractLogs(contractResult, payerAccountId);
+            if (contractLogs.length() > 1) {
+                appendJsonToJsonArray("    ", "contract_logs", contractLogs, true);
+            }
+            String contractResults = buildContractResults(contractResult, payerAccountId);
+            if (contractResults.length() > 1) {
+                appendJsonToJsonArray("    ", "contract_results", contractResults, true);
+            }
+            String contractStateChanges = buildContractStateChanges(contractResult, payerAccountId);
+            if (contractStateChanges.length() > 1) {
+                appendJsonToJsonArray("    ", "contract_state_changes", contractStateChanges, true);
+            }
+        }
+
         // remove the trailing comma from this record
         jsonArray.setLength(jsonArray.length() - 2);
         jsonArray.append("\n    }\n");  // no commas between records, and no final "]"
@@ -268,7 +292,7 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
             int tokenTransferCount = tokenTransfers.size();
             for (int tokenTransferCounter = 0; tokenTransferCounter < tokenTransferCount; tokenTransferCounter++) {
                 if (atLeastOneTokenFound) {
-                    output.append(",");
+                    output.append(",\n");
                 } else {
                     output.append("[\n");
                     atLeastOneTokenFound = true;
@@ -284,11 +308,11 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
                 output.append("            \"account_number\":\"" + accountId.getEntityNum() + "\",\n");
                 output.append("            \"amount\":" + amount + ",\n");
                 output.append("            \"is_approval\":" + isApproval + "\n");
-                output.append("          }\n");
+                output.append("          }");
             }
         }
         if (output.length() > 0) {
-            output.append("      ]\n");
+            output.append("\n      ]\n");
         }
         return output.toString();
     }
@@ -317,7 +341,7 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
                 }
                 output.append("\n");
             }
-            output.append("        ],\n");
+            output.append("        ]\n");
         }
         return output.toString();
     }
@@ -333,7 +357,7 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
             int nftTransferCount = nftTransfers.size();
             for (int nftTransferCounter = 0; nftTransferCounter < nftTransferCount; nftTransferCounter++) {
                 if (atLeastOneTokenFound) {
-                    output.append(",");
+                    output.append(",\n");
                 } else {
                     output.append("[\n");
                     atLeastOneTokenFound = true;
@@ -358,13 +382,138 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
                 output.append("            \"receiver_account_number\":\"" + receiverId.getEntityNum() + "\",\n");
                 output.append("            \"serial_number\":" + serialNumber + ",\n");
                 output.append("            \"is_approval\":" + isApproval + "\n");
-                output.append("          }\n");
+                output.append("          }");
             }
         };
         if (output.length() > 0) {
-            output.append("      ]\n");
+            output.append("\n      ]\n");
         }
         return output.toString();
+    }
+
+    private String buildContractLogs(ContractFunctionResult contractResult, EntityId payerAccountId) {
+        StringBuilder output = new StringBuilder();
+        boolean atLeastOneLogFound = false;
+        for (ContractLoginfo contractLoginfo : contractResult.getLogInfoList()) {
+            if (atLeastOneLogFound) {
+                output.append(",\n");
+            } else {
+                output.append("[\n");
+                atLeastOneLogFound = true;
+            }
+            output.append("      {\n");
+            output.append("          \"bloom\":\"");
+            output.append(Base64.encodeBase64String(contractLoginfo.getBloom().toByteArray()) + "\",\n");
+            output.append("          \"data\":\"");
+            output.append(Base64.encodeBase64String(contractLoginfo.getData().toByteArray()) + "\",\n");
+            output.append("          \"index\":\"" + contractLoginfo.getTopicCount() + "\",\n");
+            if (contractLoginfo.getTopicCount() > 0) {
+                output.append("          \"topic0\":\"");
+                output.append(Base64.encodeBase64String(contractLoginfo.getTopic(0).toByteArray()) + "\",\n");
+            }
+            if (contractLoginfo.getTopicCount() > 1) {
+                output.append("          \"topic1\":\"");
+                output.append(Base64.encodeBase64String(contractLoginfo.getTopic(1).toByteArray()) + "\",\n");
+            }
+            if (contractLoginfo.getTopicCount() > 2) {
+                output.append("          \"topic2\":\"");
+                output.append(Base64.encodeBase64String(contractLoginfo.getTopic(2).toByteArray()) + "\",\n");
+            }
+            if (contractLoginfo.getTopicCount() > 3) {
+                output.append("          \"topic3\":\"");
+                output.append(Base64.encodeBase64String(contractLoginfo.getTopic(3).toByteArray()) + "\",\n");
+            }
+            output.append("          \"payer_account_id\":\"" + payerAccountId.toString() + "\",\n");
+            output.append("          \"payer_account_shard\":\"" + payerAccountId.getShardNum() + "\",\n");
+            output.append("          \"payer_account_realm\":\"" + payerAccountId.getRealmNum() + "\",\n");
+            output.append("          \"payer_account_number\":\"" + payerAccountId.getEntityNum() + "\",\n");
+            output.append("      }");
+        };
+        if (output.length() > 0) {
+            output.append("\n    ]\n");
+        }
+        return output.toString();
+    }
+
+    // there is only a single ContractFunctionResult, not a List of them.  But, for consistency, if any of
+    // the "contract_results" data items are found, we return an array of the one contract_result.
+    private String buildContractResults(ContractFunctionResult contractResult, EntityId payerAccountId) {
+        StringBuilder output = new StringBuilder();
+        output.append("[\n");
+        output.append("      {\n");
+        output.append("        \"function_parameters\":\"");
+        output.append(Base64.encodeBase64String(contractResult.getFunctionParameters().toByteArray()) + "\",\n");
+        output.append("        \"gas_limit\":\"" + contractResult.getGas() + "\",\n");
+        output.append("        \"function_result\":\"");
+        output.append(Base64.encodeBase64String(contractResult.toByteArray()) + "\",\n");
+        output.append("        \"gas_used\":\"" + contractResult.getGasUsed() + "\",\n");
+        output.append("        \"amount\":\"" + contractResult.getAmount() + "\",\n");
+        output.append("        \"call_result\":\"");
+        output.append(Base64.encodeBase64String(contractResult.getContractCallResult().toByteArray()) + "\",\n");
+        output.append("        \"created_contract_ids\":[\n");
+        for (ContractID contractId : contractResult.getCreatedContractIDsList()) {
+            output.append("          \"" + contractId.toString() + "\",\n");
+        }
+        output.append("        ],\n");
+        output.append("        \"error_message\":\"" + contractResult.getErrorMessage() + "\",\n");
+        EntityId senderAccountId = EntityId.of(contractResult.getSenderId());
+        output.append("        \"sender_account_id\":\"" + senderAccountId.toString() + "\",\n");
+        output.append("        \"sender_account_shard\":\"" + senderAccountId.getShardNum() + "\",\n");
+        output.append("        \"sender_account_realm\":\"" + senderAccountId.getRealmNum() + "\",\n");
+        output.append("        \"sender_account_number\":\"" + senderAccountId.getEntityNum() + "\",\n");
+        output.append("        \"payer_account_id\":\"" + payerAccountId.toString() + "\",\n");
+        output.append("        \"payer_account_shard\":\"" + payerAccountId.getShardNum() + "\",\n");
+        output.append("        \"payer_account_realm\":\"" + payerAccountId.getRealmNum() + "\",\n");
+        output.append("        \"payer_account_number\":\"" + payerAccountId.getEntityNum() + "\",\n");
+        output.append("        \"bloom\":\"");
+        output.append(Base64.encodeBase64String(contractResult.getBloom().toByteArray()) + "\"\n");
+        output.append("      }\n");
+        output.append("    ]\n");
+        return output.toString();
+    }
+
+    private String buildContractStateChanges(ContractFunctionResult contractResult, EntityId payerAccountId) {
+        StringBuilder output = new StringBuilder();
+        boolean atLeastOneStateChangeFound = false;
+        for (ContractStateChange contractStateChange : contractResult.getStateChangesList()) {
+            EntityId contractId = EntityId.of(contractStateChange.getContractID());
+            for (StorageChange storageChange : contractStateChange.getStorageChangesList()) {
+                if (atLeastOneStateChangeFound) {
+                    output.append(",\n");
+                } else {
+                    output.append("[\n");
+                    atLeastOneStateChangeFound = true;
+                }
+
+                output.append("      {\n");
+                output.append("          \"contract_id\":\"" + contractId.toString() + "\",\n");
+                output.append("          \"value_written\":\"");
+                output.append(Base64.encodeBase64String(storageChange.getValueWritten().toByteArray()) + "\",\n");
+                output.append("          \"value_read\":\"");
+                output.append(Base64.encodeBase64String(storageChange.getValueRead().toByteArray()) + "\",\n");
+                output.append("          \"slot\":\"");
+                output.append(Base64.encodeBase64String(storageChange.getSlot().toByteArray()) + "\",\n");
+                output.append("          \"payer_account_id\":\"" + payerAccountId.toString() + "\",\n");
+                output.append("          \"payer_account_shard\":\"" + payerAccountId.getShardNum() + "\",\n");
+                output.append("          \"payer_account_realm\":\"" + payerAccountId.getRealmNum() + "\",\n");
+                output.append("          \"payer_account_number\":\"" + payerAccountId.getEntityNum() + "\",\n");
+                output.append("      }");
+            }
+        }
+        if (output.length() > 0) {
+            output.append("\n    ]\n");
+        }
+        return output.toString();
+    }
+
+    private ContractFunctionResult getContractFunctionResult(TransactionRecord record) {
+        if (record.hasContractCreateResult()) {
+            return record.getContractCreateResult();
+        }
+        if (record.hasContractCallResult()) {
+            return record.getContractCallResult();
+        }
+        return null;
     }
 
     private void logItem(RecordItem recordItem) {
