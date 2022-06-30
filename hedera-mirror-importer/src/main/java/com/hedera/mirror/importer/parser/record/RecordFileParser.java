@@ -30,6 +30,7 @@ import com.hedera.mirror.common.util.DomainUtils;
 import com.hedera.mirror.importer.parser.record.entity.EntityRecordItemListener;
 
 import com.hederahashgraph.api.proto.java.AccountAmount;
+import com.hederahashgraph.api.proto.java.AssessedCustomFee;
 import com.hederahashgraph.api.proto.java.ContractFunctionResult;
 import com.hederahashgraph.api.proto.java.ContractID;
 import com.hederahashgraph.api.proto.java.ContractLoginfo;
@@ -52,6 +53,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.inject.Named;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.Level;
@@ -269,6 +271,10 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
         appendStringToJsonArray("    ", "transaction_id", t.toJsonPartial("transactionId"), true);
         appendJsonToJsonArray("    ", "fields", t.toJsonPartial("fields"), true);
         appendLongToJsonArray("    ", "consensus_timestamp", t.getId(), true);
+        String assessedCustomFees = buildAssessedCustomFeesJsonArray(recordItem, tr, t);
+        if (assessedCustomFees.length() > 1) {
+            appendJsonToJsonArray("    ", "assessed_custom_fees", assessedCustomFees, true);
+        }
         String tokenTransfers = buildTokenTransfersJsonArray(recordItem, tr, t);
         if (tokenTransfers.length() > 1) {
             appendJsonToJsonArray("    ", "transfers_tokens", tokenTransfers, true);
@@ -302,6 +308,39 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
         // remove the trailing comma from this record
         jsonArray.setLength(jsonArray.length() - 2);
         jsonArray.append("\n    }\n");  // no commas between records, and no final "]"
+    }
+
+    private String buildAssessedCustomFeesJsonArray(RecordItem recordItem, TransactionRecord tr, Transaction t) {
+        int count = tr.getAssessedCustomFeesCount();
+        if (count == 0) {
+            return "";
+        }
+        EntityId payerAccountId = recordItem.getPayerAccountId();
+        StringBuilder output = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            AssessedCustomFee assessedCustomFee = tr.getAssessedCustomFees(i);
+            if (i == 0) {
+                output.append("[\n");
+            } else {
+                output.append(",\n");
+            }
+            EntityId collectorAccountId = EntityId.of(assessedCustomFee.getFeeCollectorAccountId());
+            List<String> effectivePayerEntityIds = assessedCustomFee.getEffectivePayerAccountIdList().stream()
+                    .map(EntityId::of)
+                    .map(EntityId::toString)
+                    .collect(Collectors.toList());
+            String effectivePayersList = String.join(", ", effectivePayerEntityIds);
+            EntityId tokenId = EntityId.of(assessedCustomFee.getTokenId());
+            output.append("          {\n");
+            output.append("            \"amount\":\"" + assessedCustomFee.getAmount() + "\",\n");
+            output.append("            \"collector_account_id\":\"" + collectorAccountId.toString() + "\",\n");
+            output.append("            \"effective_payer_account_ids\":[ " + effectivePayersList + " ],\n");
+            output.append("            \"payer_account_id\":\"" + payerAccountId.toString() + "\",\n");
+            output.append("            \"token_id\":\"" + tokenId.toString() + "\"\n");
+            output.append("          }");
+        }
+        output.append("\n      ]\n");
+        return output.toString();
     }
 
     private String buildTokenTransfersJsonArray(RecordItem recordItem, TransactionRecord tr, Transaction t) {
