@@ -57,7 +57,6 @@ import java.util.stream.Collectors;
 import javax.inject.Named;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.Level;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.transaction.annotation.Transactional;
@@ -181,29 +180,57 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
 
             String filename = System.getProperty("user.dir") + "/tempDir/" +
                     recordFile.getName().replace(".rcd",".json");
+            File destFile = new File(filename);
+            int counter = 1;
+            while (destFile.exists()) {
+                counter++;
+                destFile = new File(filename + "-" + counter);
+            }
+
+            try {
+                destFile.getParentFile().mkdirs(); // create parent directories if they don't already exist
+                destFile.createNewFile();
+            } catch (Exception e) {
+                log.error("Error creating file {}", destFile.toString(), e);
+            }
+
+            try (
+                FileWriter fw = new FileWriter(destFile, true);
+                BufferedWriter bw = new BufferedWriter(fw);
+            ) {
+                bw.write(contents);
+                log.info("Archived file to {}", destFile.toString());
+                log.warn("MYK: Wrote {} bytes to {}", contents.length(), destFile.toString());
+            } catch (Exception e) {
+                log.error("Error archiving file to {}", destFile.toString(), e);
+            }
+
+            recordFile.finishLoad(count);
+
+            recordStreamFileListener.onEnd(recordFile);
 
             String filenameRecordFile = System.getProperty("user.dir") + "/tempRecord/" +
                     recordFile.getName().replace(".rcd",".json");
-           writeFile(filename, contents);
-           writeFile(filenameRecordFile, recordFileContents.toString());
-           recordFile.finishLoad(count);
-           recordStreamFileListener.onEnd(recordFile);
+            writeFile(filename, contents);
+            writeFile(filenameRecordFile, recordFileContents.toString());
+            recordFile.finishLoad(count);
+            recordStreamFileListener.onEnd(recordFile);
         } catch (Exception ex) {
             recordStreamFileListener.onError();
             throw ex;
         }
     }
 
-    private void recordFileJsonAppender(String value, StringBuilder recordFileContents, String fieldName, boolean comma) {
-       recordFileContents.append("\"" + fieldName + "\":");
+    private void recordFileJsonAppender(String value, StringBuilder recordFileContents, String fieldName,
+            boolean comma) {
+        recordFileContents.append("\"" + fieldName + "\":");
         recordFileContents.append(value);
         if (comma) {
            recordFileContents.append(",");
-       }
+        }
         recordFileContents.append("\n");
     }
 
-    @NotNull
     private void writeFile(String filename, String contents) {
         File destFile = new File(filename);
         int counter = 1;
@@ -219,8 +246,8 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
         }
 
         try (
-                FileWriter fw = new FileWriter(destFile, true);
-                BufferedWriter bw = new BufferedWriter(fw);
+            FileWriter fw = new FileWriter(destFile, true);
+            BufferedWriter bw = new BufferedWriter(fw);
         ) {
             bw.write(contents);
             log.info("Archived file to {}", destFile.toString());
