@@ -50,6 +50,7 @@ import com.hedera.mirror.common.util.DomainUtils;
 @Builder(toBuilder = true)
 @Data
 @Entity
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class RecordFile implements StreamFile<RecordItem> {

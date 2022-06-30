@@ -50,6 +50,7 @@ services:
     volumes:
       - ./application.yml:/usr/etc/hedera-mirror-importer/application.yml
       - ./tempDir:/app/tempDir
+      - ./tempRecord:/app/tempRecord
 
   monitor:
     deploy:
