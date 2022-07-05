@@ -49,6 +49,7 @@ import io.micrometer.core.instrument.Timer;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -175,8 +176,23 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
             final StringBuilder recordFileContents = new StringBuilder();
             recordFileContents.append("{" + "\n");
             recordFileJsonAppender(recordFile.getConsensusStart().toString(), recordFileContents, "consensus_start_timestamp", true);
-            recordFileJsonAppender(recordFile.getConsensusEnd().toString(), recordFileContents, "consensus_end_timestamp", false);
-            recordFileContents.append("}");
+            recordFileJsonAppender(recordFile.getConsensusEnd().toString(), recordFileContents, "consensus_end_timestamp", true);
+            String dataHash = Base64.encodeBase64String(recordFile.getMetadataHash().getBytes(StandardCharsets.UTF_8));
+            recordFileJsonAppender(dataHash, recordFileContents, "data_hash", true);
+            String prevHash = Base64.encodeBase64String(recordFile.getPreviousHash().getBytes(StandardCharsets.UTF_8));
+            recordFileJsonAppender(prevHash, recordFileContents, "prev_hash", true);
+            recordFileJsonAppender("" + recordFile.getIndex(), recordFileContents, "number", true);
+            StringBuilder fields = new StringBuilder();
+            fields.append("{\n");
+            fields.append("  \"count\":\"" + recordFile.getCount() + "\",\n");
+            fields.append("  \"gas_used\":\"" + recordFile.getGasUsed() + "\",\n");
+            fields.append("  \"hapi_version\":\"" + recordFile.getHapiVersion() + "\",\n");
+            fields.append("  \"logs_bloom\":\"" + Base64.encodeBase64String(recordFile.getLogsBloom()) + "\",\n");
+            fields.append("  \"name\":\"" + recordFile.getName() + "\",\n");
+            fields.append("  \"size\":\"" + recordFile.getSize() + "\"\n}\n");
+            recordFileJsonAppender(fields.toString(), recordFileContents, "fields", false);
+
+            recordFileContents.append("}" + "\n");
 
             String filename = System.getProperty("user.dir") + "/tempDir/" +
                     recordFile.getName().replace(".rcd",".json");
