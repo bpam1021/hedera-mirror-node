@@ -178,9 +178,9 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
             recordFileJsonAppender(recordFile.getConsensusStart().toString(), recordFileContents, "consensus_start_timestamp", true);
             recordFileJsonAppender(recordFile.getConsensusEnd().toString(), recordFileContents, "consensus_end_timestamp", true);
             String dataHash = Base64.encodeBase64String(recordFile.getMetadataHash().getBytes(StandardCharsets.UTF_8));
-            recordFileJsonAppender(dataHash, recordFileContents, "data_hash", true);
+            recordFileJsonAppender("\"" + dataHash + "\"", recordFileContents, "data_hash", true);
             String prevHash = Base64.encodeBase64String(recordFile.getPreviousHash().getBytes(StandardCharsets.UTF_8));
-            recordFileJsonAppender(prevHash, recordFileContents, "prev_hash", true);
+            recordFileJsonAppender("\"" + prevHash + "\"", recordFileContents, "prev_hash", true);
             recordFileJsonAppender("" + recordFile.getIndex(), recordFileContents, "number", true);
             StringBuilder fields = new StringBuilder();
             fields.append("{\n");
