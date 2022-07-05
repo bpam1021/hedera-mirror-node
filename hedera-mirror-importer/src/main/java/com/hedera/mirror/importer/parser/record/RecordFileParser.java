@@ -542,7 +542,8 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
         output.append(Base64.encodeBase64String(contractResult.getContractCallResult().toByteArray()) + "\",\n");
         output.append("        \"created_contract_ids\":[\n");
         for (ContractID contractId : contractResult.getCreatedContractIDsList()) {
-            output.append("          \"" + contractId.toString() + "\",\n");
+            EntityId contractEntity = EntityId.of(contractId);
+            output.append("          \"contractNum\":\"" + contractEntity.toString() + "\",\n");
         }
         output.append("        ],\n");
         output.append("        \"error_message\":\"" + contractResult.getErrorMessage() + "\",\n");
