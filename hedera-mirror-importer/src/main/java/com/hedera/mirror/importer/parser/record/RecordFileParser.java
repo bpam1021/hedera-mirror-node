@@ -24,6 +24,7 @@ import static com.hedera.mirror.importer.config.MirrorDateRangePropertiesProcess
 
 import com.google.common.collect.ImmutableMap;
 
+import com.hedera.mirror.common.domain.addressbook.AddressBook;
 import com.hedera.mirror.common.domain.entity.EntityId;
 import com.hedera.mirror.common.domain.transaction.Transaction;
 import com.hedera.mirror.common.util.DomainUtils;
@@ -182,6 +183,28 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
             String prevHash = Base64.encodeBase64String(recordFile.getPreviousHash().getBytes(StandardCharsets.UTF_8));
             recordFileJsonAppender("\"" + prevHash + "\"", recordFileContents, "prev_hash", true);
             recordFileJsonAppender("" + recordFile.getIndex(), recordFileContents, "number", true);
+            String addressBookAsString = (recordFile.getAddressBook() == null) ? "null"
+                    : "\"" + recordFile.getAddressBook().toString() + "\"";
+            recordFileJsonAppender("[ " + addressBookAsString + " ]", recordFileContents, "address_books", true);
+            StringBuilder signatureFiles = new StringBuilder();
+            signatureFiles.append("[");
+            Map<String, String> signatures = recordFile.getSignatureFiles();
+            boolean firstSignature = true;
+            for (Map.Entry<String, String> entry : signatures.entrySet()) {
+                if (firstSignature) {
+                    signatureFiles.append("\n");
+                    firstSignature = false;
+                } else {
+                    signatureFiles.append(",\n");
+                }
+                signatureFiles.append("  {\n");
+                signatureFiles.append("    \"account_number\":\"" + entry.getKey() + "\",\n");
+                signatureFiles.append("    \"signature_file_hash\":\"" + entry.getValue() + "\"\n");
+                signatureFiles.append("  }");
+            }
+            signatureFiles.append("\n  ]\n");
+            recordFileJsonAppender(signatureFiles.toString(), recordFileContents, "signature_files", true);
+  
             StringBuilder fields = new StringBuilder();
             fields.append("{\n");
             fields.append("  \"count\":\"" + recordFile.getCount() + "\",\n");
