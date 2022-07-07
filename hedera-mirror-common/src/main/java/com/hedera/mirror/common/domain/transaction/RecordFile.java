@@ -62,6 +62,7 @@ public class RecordFile implements StreamFile<RecordItem> {
     public static final Version HAPI_VERSION_0_23_0 = new Version(0, 23, 0);
 
     @ToString.Exclude
+    @Transient
     private AddressBook addressBook;
 
     @Getter(lazy = true)
