@@ -129,6 +129,7 @@ public class RecordFile implements StreamFile<RecordItem> {
     private String previousHash;
 
     @ToString.Exclude
+    @Transient
     private Map<String, String> signatureFiles = new TreeMap<>();
 
     private Integer size;
