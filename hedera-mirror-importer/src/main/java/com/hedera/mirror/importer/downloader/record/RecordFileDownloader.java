@@ -37,6 +37,7 @@ import com.hedera.mirror.importer.reader.signature.SignatureFileReader;
 
 @Named
 public class RecordFileDownloader extends Downloader<RecordFile> {
+    private RecordFile[] persistedRecordFile = new RecordFile[1];
 
     public RecordFileDownloader(
             S3AsyncClient s3Client, AddressBookService addressBookService,
@@ -48,12 +49,13 @@ public class RecordFileDownloader extends Downloader<RecordFile> {
         super(s3Client, addressBookService, downloaderProperties, meterRegistry,
                 nodeSignatureVerifier, signatureFileReader, recordFileReader, streamFileNotifier,
                 mirrorDateRangePropertiesProcessor);
+        persistedRecordFile[0] = new RecordFile();
     }
 
     @Override
     @Leader
     @Scheduled(fixedDelayString = "${hedera.mirror.importer.downloader.record.frequency:500}")
     public void download() {
-        downloadNextBatch();
+        downloadNextBatch(persistedRecordFile);
     }
 }

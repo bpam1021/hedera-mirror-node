@@ -29,6 +29,7 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.TreeMultimap;
+import com.hedera.mirror.common.domain.transaction.RecordFile;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import java.nio.file.Path;
@@ -41,6 +42,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -102,6 +104,7 @@ public abstract class Downloader<T extends StreamFile> {
     private final Timer downloadLatencyMetric;
     private final Timer streamCloseMetric;
     private final Timer.Builder streamVerificationMetric;
+    private RecordFile persistedRecordFile = null;
 
     protected Downloader(S3AsyncClient s3Client,
                          AddressBookService addressBookService, DownloaderProperties downloaderProperties,
@@ -150,7 +153,7 @@ public abstract class Downloader<T extends StreamFile> {
 
     public abstract void download();
 
-    protected void downloadNextBatch() {
+    protected void downloadNextBatch(RecordFile[] recordFiles) {
         if (!downloaderProperties.isEnabled()) {
             return;
         }
@@ -170,7 +173,17 @@ public abstract class Downloader<T extends StreamFile> {
             }
 
             // Verify signature files and download corresponding files of valid signature files
-            verifySigsAndDownloadDataFiles(sigFilesMap);
+            Map<String, String> signatureFiles = verifySigsAndDownloadDataFiles(sigFilesMap);
+            // update recently-added RecordFile fields
+            if (recordFiles != null) {
+                log.warn("MYK: storing AddressBook and signatureFiles for Record");
+                RecordFile recordFile = (RecordFile) persistedRecordFile;
+                recordFile.setAddressBook(addressBook);
+                recordFile.setSignatureFiles(signatureFiles);
+                recordFiles[0] = recordFile;
+            } else {
+                log.warn("non-RECORD type of Downloader -- {}", streamType.name());
+            }
         } catch (SignatureVerificationException e) {
             log.warn(e.getMessage());
         } catch (InterruptedException e) {
@@ -362,12 +375,13 @@ public abstract class Downloader<T extends StreamFile> {
      *
      * @param sigFilesMap signature files grouped by filename
      */
-    private void verifySigsAndDownloadDataFiles(Multimap<String, FileStreamSignature> sigFilesMap) {
+    private Map<String, String> verifySigsAndDownloadDataFiles(Multimap<String, FileStreamSignature> sigFilesMap) {
         Instant endDate = mirrorProperties.getEndDate();
+        Map<String, String> results = new TreeMap<>();
 
         for (var sigFilenameIter = sigFilesMap.keySet().iterator(); sigFilenameIter.hasNext(); ) {
             if (ShutdownHelper.isStopping()) {
-                return;
+                return results;
             }
 
             Instant startTime = Instant.now();
@@ -388,7 +402,7 @@ public abstract class Downloader<T extends StreamFile> {
 
             for (FileStreamSignature signature : signatures) {
                 if (ShutdownHelper.isStopping()) {
-                    return;
+                    return results;
                 }
 
                 // Ignore signatures that didn't validate or weren't in the majority
@@ -406,6 +420,10 @@ public abstract class Downloader<T extends StreamFile> {
                     StreamFileData streamFileData = new StreamFileData(dataFilename, pendingDownload.getBytes());
                     T streamFile = streamFileReader.read(streamFileData);
                     streamFile.setNodeAccountId(signature.getNodeAccountId());
+                    // MYK: very ugly hack
+                    if (streamType == StreamType.RECORD) {
+                        persistedRecordFile = (RecordFile) streamFile;
+                    }
 
                     verify(streamFile, signature);
 
@@ -421,6 +439,12 @@ public abstract class Downloader<T extends StreamFile> {
                         });
                     }
 
+                    signatures.forEach(s -> {
+                        String accountNumber = s.getNodeAccountIdString();
+                        String signatureFileHash = s.getFileHashAsHex();
+        		results.put(accountNumber, signatureFileHash);
+                    });
+
                     if (!downloaderProperties.isPersistBytes()) {
                         streamFile.setBytes(null);
                     }
@@ -428,7 +452,7 @@ public abstract class Downloader<T extends StreamFile> {
                     if (dataFilename.getInstant().isAfter(endDate)) {
                         downloaderProperties.setEnabled(false);
                         log.warn("Disabled polling after downloading all files <= endDate ({})", endDate);
-                        return;
+                        return results;
                     }
 
                     onVerified(pendingDownload, streamFile);
@@ -455,6 +479,7 @@ public abstract class Downloader<T extends StreamFile> {
                     .register(meterRegistry)
                     .record(Duration.between(startTime, Instant.now()));
         }
+        return results;
     }
 
     private PendingDownload downloadSignedDataFile(FileStreamSignature fileStreamSignature) {

@@ -56,6 +56,6 @@ public class AccountBalancesDownloader extends Downloader<AccountBalanceFile> {
     @Leader
     @Scheduled(fixedDelayString = "${hedera.mirror.importer.downloader.balance.frequency:30000}")
     public void download() {
-        downloadNextBatch();
+        downloadNextBatch(null);
     }
 }

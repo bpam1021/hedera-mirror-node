@@ -54,6 +54,6 @@ public class EventFileDownloader extends Downloader<EventFile> {
     @Leader
     @Scheduled(fixedDelayString = "${hedera.mirror.downloader.event.frequency:5000}")
     public void download() {
-        downloadNextBatch();
+        downloadNextBatch(null);
     }
 }

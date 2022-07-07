@@ -20,9 +20,12 @@ package com.hedera.mirror.common.domain.transaction;
  * ‍
  */
 
+import com.hedera.mirror.common.domain.addressbook.AddressBook;
 import com.hederahashgraph.api.proto.java.ContractFunctionResult;
 import com.hederahashgraph.api.proto.java.TransactionRecord;
 import java.time.Instant;
+import java.util.TreeMap;
+import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -57,6 +60,9 @@ public class RecordFile implements StreamFile<RecordItem> {
 
     public static final Version HAPI_VERSION_NOT_SET = new Version(0, 0, 0);
     public static final Version HAPI_VERSION_0_23_0 = new Version(0, 23, 0);
+
+    @ToString.Exclude
+    private AddressBook addressBook;
 
     @Getter(lazy = true)
     @Transient
@@ -120,6 +126,9 @@ public class RecordFile implements StreamFile<RecordItem> {
     @Column(name = "prev_hash")
     @ToString.Exclude
     private String previousHash;
+
+    @ToString.Exclude
+    private Map<String, String> signatureFiles = new TreeMap<>();
 
     private Integer size;
 
