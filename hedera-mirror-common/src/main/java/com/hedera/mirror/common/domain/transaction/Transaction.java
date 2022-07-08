@@ -132,7 +132,7 @@ public class Transaction implements Persistable<Long> {
             // MYK -- to be determined -- append scheduled and nonce to this?
             return payerAccountId.toString() + "-" + seconds + "-" + nanos;
         } else if (designator.equalsIgnoreCase("fields")) {
-            final String quote = "\"";
+            final String quote = "\\\"";
             final String equals = "\":";
             final String equalsString = "\\\":\\\"";
             final String comma = ",";

@@ -205,7 +205,7 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
             recordFileJsonAppender(signatureFiles.toString(), recordFileContents, "signature_files", true);
   
             StringBuilder fields = new StringBuilder();
-            fields.append("{");
+            fields.append("\"{");
             fields.append(" \\\"count\\\":\\\"" + recordFile.getCount() + "\\\",");
             fields.append(" \\\"gas_used\\\":\\\"" + recordFile.getGasUsed() + "\\\",");
             fields.append(" \\\"hapi_version\\\":\\\"" + recordFile.getHapiVersion() + "\\\",");
