@@ -186,7 +186,7 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
             recordFileJsonAppender("\"" + prevHash + "\"", recordFileContents, "prev_hash", true);
             recordFileJsonAppender("" + recordFile.getIndex(), recordFileContents, "number", true);
             String addressBookAsString = (recordFile.getAddressBook() == null) ? " "
-                    : " \"" + recordFile.getAddressBook().toString() + "\" ";
+                    : " \\\"" + recordFile.getAddressBook().toString() + "\\\" ";
             recordFileJsonAppender("[" + addressBookAsString + "]", recordFileContents, "address_books", true);
             StringBuilder signatureFiles = new StringBuilder();
             signatureFiles.append("[");
