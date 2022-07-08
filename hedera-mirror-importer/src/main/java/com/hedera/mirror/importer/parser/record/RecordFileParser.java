@@ -187,9 +187,9 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
             recordFileJsonAppender("" + recordFile.getIndex(), recordFileContents, "number", true);
             String addressBookAsString = (recordFile.getAddressBook() == null) ? " "
                     : " \\\"" + recordFile.getAddressBook().toString() + "\\\" ";
-            recordFileJsonAppender("[" + addressBookAsString + "]", recordFileContents, "address_books", true);
+            recordFileJsonAppender("\"[" + addressBookAsString + "]\"", recordFileContents, "address_books", true);
             StringBuilder signatureFiles = new StringBuilder();
-            signatureFiles.append("[");
+            signatureFiles.append("\"[");
             Map<String, String> signatures = recordFile.getSignatureFiles();
             boolean firstSignature = true;
             for (Map.Entry<String, String> entry : signatures.entrySet()) {
@@ -201,7 +201,7 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
                 signatureFiles.append(" {\\\"account_number\\\":\\\"" + entry.getKey() + "\\\",");
                 signatureFiles.append(" \\\"signature_file_hash\\\":\\\"" + entry.getValue() + "\\\"}");
             }
-            signatureFiles.append(" ]");
+            signatureFiles.append(" ]\"");
             recordFileJsonAppender(signatureFiles.toString(), recordFileContents, "signature_files", true);
   
             StringBuilder fields = new StringBuilder();
@@ -573,7 +573,7 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
         output.append(" \\\"amount\\\":\\\"" + contractResult.getAmount() + "\\\",");
         output.append(" \\\"call_result\\\":\\\"");
         output.append(Base64.encodeBase64String(contractResult.getContractCallResult().toByteArray()) + "\\\",");
-        output.append(" \\\"created_contract_ids\\\":\"[");
+        output.append(" \\\"created_contract_ids\\\":\\\"[");
         boolean firstContract = true;
         for (ContractID contractId : contractResult.getCreatedContractIDsList()) {
             if (firstContract) {
@@ -584,7 +584,7 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
             EntityId contractEntity = EntityId.of(contractId);
             output.append(" \\\"" + contractEntity.toString() + "\\\"");
         }
-        output.append(" ]\",");
+        output.append(" ]\\\",");
         output.append(" \\\"error_message\\\":\\\"" + contractResult.getErrorMessage() + "\\\",");
         EntityId senderAccountId = EntityId.of(contractResult.getSenderId());
         output.append(" \\\"sender_account_id\\\":\\\"" + senderAccountId.toString() + "\\\",");
