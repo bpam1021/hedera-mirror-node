@@ -134,9 +134,9 @@ public class Transaction implements Persistable<Long> {
         } else if (designator.equalsIgnoreCase("fields")) {
             final String quote = "\"";
             final String equals = "\":";
-            final String equalsString = "\":\"";
+            final String equalsString = "\\\":\\\"";
             final String comma = ",";
-            final String commaString = "\",";
+            final String commaString = "\\\",";
             StringBuilder sb = new StringBuilder()
                 .append("\"{")
                 .append(quote)
