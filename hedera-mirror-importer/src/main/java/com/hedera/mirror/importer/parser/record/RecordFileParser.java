@@ -175,47 +175,46 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
 
             //For record_file table
             final StringBuilder recordFileContents = new StringBuilder();
-            recordFileContents.append("{" + "\n");
-            recordFileJsonAppender(recordFile.getConsensusStart().toString(), recordFileContents, "consensus_start_timestamp", true);
-            recordFileJsonAppender(recordFile.getConsensusEnd().toString(), recordFileContents, "consensus_end_timestamp", true);
+            recordFileContents.append("{");
+            recordFileJsonAppender(recordFile.getConsensusStart().toString(), recordFileContents,
+                    "consensus_start_timestamp", true);
+            recordFileJsonAppender(recordFile.getConsensusEnd().toString(), recordFileContents,
+                    "consensus_end_timestamp", true);
             String dataHash = Base64.encodeBase64String(recordFile.getMetadataHash().getBytes(StandardCharsets.UTF_8));
             recordFileJsonAppender("\"" + dataHash + "\"", recordFileContents, "data_hash", true);
             String prevHash = Base64.encodeBase64String(recordFile.getPreviousHash().getBytes(StandardCharsets.UTF_8));
             recordFileJsonAppender("\"" + prevHash + "\"", recordFileContents, "prev_hash", true);
             recordFileJsonAppender("" + recordFile.getIndex(), recordFileContents, "number", true);
-            String addressBookAsString = (recordFile.getAddressBook() == null) ? "null"
-                    : "\"" + recordFile.getAddressBook().toString() + "\"";
-            recordFileJsonAppender("[ " + addressBookAsString + " ]", recordFileContents, "address_books", true);
+            String addressBookAsString = (recordFile.getAddressBook() == null) ? " "
+                    : " \"" + recordFile.getAddressBook().toString() + "\" ";
+            recordFileJsonAppender("[" + addressBookAsString + "]", recordFileContents, "address_books", true);
             StringBuilder signatureFiles = new StringBuilder();
             signatureFiles.append("[");
             Map<String, String> signatures = recordFile.getSignatureFiles();
             boolean firstSignature = true;
             for (Map.Entry<String, String> entry : signatures.entrySet()) {
                 if (firstSignature) {
-                    signatureFiles.append("\n");
                     firstSignature = false;
                 } else {
-                    signatureFiles.append(",\n");
+                    signatureFiles.append(",");
                 }
-                signatureFiles.append("  {\n");
-                signatureFiles.append("    \"account_number\":\"" + entry.getKey() + "\",\n");
-                signatureFiles.append("    \"signature_file_hash\":\"" + entry.getValue() + "\"\n");
-                signatureFiles.append("  }");
+                signatureFiles.append(" {\\\"account_number\\\":\\\"" + entry.getKey() + "\\\",");
+                signatureFiles.append(" \\\"signature_file_hash\\\":\\\"" + entry.getValue() + "\\\"}");
             }
-            signatureFiles.append("\n  ]\n");
+            signatureFiles.append(" ]");
             recordFileJsonAppender(signatureFiles.toString(), recordFileContents, "signature_files", true);
   
             StringBuilder fields = new StringBuilder();
-            fields.append("{\n");
-            fields.append("  \"count\":\"" + recordFile.getCount() + "\",\n");
-            fields.append("  \"gas_used\":\"" + recordFile.getGasUsed() + "\",\n");
-            fields.append("  \"hapi_version\":\"" + recordFile.getHapiVersion() + "\",\n");
-            fields.append("  \"logs_bloom\":\"" + Base64.encodeBase64String(recordFile.getLogsBloom()) + "\",\n");
-            fields.append("  \"name\":\"" + recordFile.getName() + "\",\n");
-            fields.append("  \"size\":\"" + recordFile.getSize() + "\"\n}\n");
+            fields.append("{");
+            fields.append(" \\\"count\\\":\\\"" + recordFile.getCount() + "\\\",");
+            fields.append(" \\\"gas_used\\\":\\\"" + recordFile.getGasUsed() + "\\\",");
+            fields.append(" \\\"hapi_version\\\":\\\"" + recordFile.getHapiVersion() + "\\\",");
+            fields.append(" \\\"logs_bloom\\\":\\\"" + Base64.encodeBase64String(recordFile.getLogsBloom()) + "\\\",");
+            fields.append(" \\\"name\\\":\\\"" + recordFile.getName() + "\\\",");
+            fields.append(" \\\"size\\\":\\\"" + recordFile.getSize() + "\\\"}\"");
             recordFileJsonAppender(fields.toString(), recordFileContents, "fields", false);
 
-            recordFileContents.append("}" + "\n");
+            recordFileContents.append(" }\n");
 
             String filename = System.getProperty("user.dir") + "/tempDir/" +
                     recordFile.getName().replace(".rcd",".json");
@@ -267,7 +266,6 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
         if (comma) {
            recordFileContents.append(",");
         }
-        recordFileContents.append("\n");
     }
 
     private void writeFile(String filename, String contents) {
@@ -303,7 +301,6 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
         if (comma) {
             jsonArray.append(",");
         }
-        jsonArray.append("\n");
     }
 
     private void appendStringToJsonArray(String prefix, String fieldName, String value, boolean comma) {
@@ -327,31 +324,31 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
             jsonArray.append("{}\n");
             return;
         }
-        jsonArray.append("{\n");
-        appendStringToJsonArray("    ", "entityId", t.toJsonPartial("entityId"), true);
-        appendStringToJsonArray("    ", "type", t.toJsonPartial("transactionType"), true);
-        appendIntegerToJsonArray("    ", "index", t.toJsonPartialInteger("index"), true);
-        appendIntegerToJsonArray("    ", "result", t.toJsonPartialInteger("result"), true);
-        appendStringToJsonArray("    ", "scheduled", t.toJsonPartial("scheduled"), true);
-        appendIntegerToJsonArray("    ", "nonce", t.toJsonPartialInteger("nonce"), true);
-        appendStringToJsonArray("    ", "transaction_id", t.toJsonPartial("transactionId"), true);
-        appendJsonToJsonArray("    ", "fields", t.toJsonPartial("fields"), true);
-        appendLongToJsonArray("    ", "consensus_timestamp", t.getId(), true);
+        jsonArray.append("{");
+        appendStringToJsonArray(" ", "entityId", t.toJsonPartial("entityId"), true);
+        appendStringToJsonArray(" ", "type", t.toJsonPartial("transactionType"), true);
+        appendIntegerToJsonArray(" ", "index", t.toJsonPartialInteger("index"), true);
+        appendIntegerToJsonArray(" ", "result", t.toJsonPartialInteger("result"), true);
+        appendStringToJsonArray(" ", "scheduled", t.toJsonPartial("scheduled"), true);
+        appendIntegerToJsonArray(" ", "nonce", t.toJsonPartialInteger("nonce"), true);
+        appendStringToJsonArray(" ", "transaction_id", t.toJsonPartial("transactionId"), true);
+        appendJsonToJsonArray(" ", "fields", t.toJsonPartial("fields"), true);
+        appendLongToJsonArray(" ", "consensus_timestamp", t.getId(), true);
         String assessedCustomFees = buildAssessedCustomFeesJsonArray(recordItem, tr, t);
         if (assessedCustomFees.length() > 1) {
-            appendJsonToJsonArray("    ", "assessed_custom_fees", assessedCustomFees, true);
+            appendJsonToJsonArray(" ", "assessed_custom_fees", assessedCustomFees, true);
         }
         String tokenTransfers = buildTokenTransfersJsonArray(recordItem, tr, t);
         if (tokenTransfers.length() > 1) {
-            appendJsonToJsonArray("    ", "transfers_tokens", tokenTransfers, true);
+            appendJsonToJsonArray(" ", "transfers_tokens", tokenTransfers, true);
         }
         String hbarTransfers = buildHbarTransfersJsonArray(recordItem, tr, t);
         if (hbarTransfers.length() > 1) {
-            appendJsonToJsonArray("    ", "transfers_hbar", hbarTransfers, true);
+            appendJsonToJsonArray(" ", "transfers_hbar", hbarTransfers, true);
         }
         String nftTransfers = buildNftTransfersJsonArray(recordItem, tr, t);
         if (nftTransfers.length() > 1) {
-            appendJsonToJsonArray("    ", "transfers_nft", nftTransfers, true);
+            appendJsonToJsonArray(" ", "transfers_nft", nftTransfers, true);
         }
 
         ContractFunctionResult contractResult = getContractFunctionResult(tr);
@@ -359,21 +356,21 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
         if (contractResult != null) {
             String contractLogs = buildContractLogs(contractResult, payerAccountId);
             if (contractLogs.length() > 1) {
-                appendJsonToJsonArray("    ", "contract_logs", contractLogs, true);
+                appendJsonToJsonArray(" ", "contract_logs", contractLogs, true);
             }
             String contractResults = buildContractResults(contractResult, payerAccountId);
             if (contractResults.length() > 1) {
-                appendJsonToJsonArray("    ", "contract_results", contractResults, true);
+                appendJsonToJsonArray(" ", "contract_results", contractResults, true);
             }
             String contractStateChanges = buildContractStateChanges(contractResult, payerAccountId);
             if (contractStateChanges.length() > 1) {
-                appendJsonToJsonArray("    ", "contract_state_changes", contractStateChanges, true);
+                appendJsonToJsonArray(" ", "contract_state_changes", contractStateChanges, true);
             }
         }
 
         // remove the trailing comma from this record
-        jsonArray.setLength(jsonArray.length() - 2);
-        jsonArray.append("\n    }\n");  // no commas between records, and no final "]"
+        jsonArray.setLength(jsonArray.length() - 1);
+        jsonArray.append(" }\n");  // no commas between records, and no final "]"
     }
 
     private String buildAssessedCustomFeesJsonArray(RecordItem recordItem, TransactionRecord tr, Transaction t) {
@@ -386,9 +383,9 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
         for (int i = 0; i < count; i++) {
             AssessedCustomFee assessedCustomFee = tr.getAssessedCustomFees(i);
             if (i == 0) {
-                output.append("[\n");
+                output.append("\"[");
             } else {
-                output.append(",\n");
+                output.append(",");
             }
             EntityId collectorAccountId = EntityId.of(assessedCustomFee.getFeeCollectorAccountId());
             List<String> effectivePayerEntityIds = assessedCustomFee.getEffectivePayerAccountIdList().stream()
@@ -397,15 +394,15 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
                     .collect(Collectors.toList());
             String effectivePayersList = String.join(", ", effectivePayerEntityIds);
             EntityId tokenId = EntityId.of(assessedCustomFee.getTokenId());
-            output.append("          {\n");
-            output.append("            \"amount\":\"" + assessedCustomFee.getAmount() + "\",\n");
-            output.append("            \"collector_account_id\":\"" + collectorAccountId.toString() + "\",\n");
-            output.append("            \"effective_payer_account_ids\":[ " + effectivePayersList + " ],\n");
-            output.append("            \"payer_account_id\":\"" + payerAccountId.toString() + "\",\n");
-            output.append("            \"token_id\":\"" + tokenId.toString() + "\"\n");
-            output.append("          }");
+            output.append(" {");
+            output.append(" \\\"amount\":\\\"" + assessedCustomFee.getAmount() + "\\\",");
+            output.append(" \\\"collector_account_id\":\\\"" + collectorAccountId.toString() + "\\\",");
+            output.append(" \\\"effective_payer_account_ids\":\\[ " + effectivePayersList + " ],");
+            output.append(" \\\"payer_account_id\":\\\"" + payerAccountId.toString() + "\\\",");
+            output.append(" \\\"token_id\":\\\"" + tokenId.toString() + "\\\"");
+            output.append("}");
         }
-        output.append("\n      ]\n");
+        output.append(" ]\"");
         return output.toString();
     }
 
@@ -421,27 +418,27 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
             int tokenTransferCount = tokenTransfers.size();
             for (int tokenTransferCounter = 0; tokenTransferCounter < tokenTransferCount; tokenTransferCounter++) {
                 if (atLeastOneTokenFound) {
-                    output.append(",\n");
+                    output.append(",");
                 } else {
-                    output.append("[\n");
+                    output.append("\"[");
                     atLeastOneTokenFound = true;
                 }
                 AccountAmount accountAmount = tokenTransfers.get(tokenTransferCounter);
                 EntityId accountId = EntityId.of(accountAmount.getAccountID());
                 long amount = accountAmount.getAmount();
                 boolean isApproval = accountAmount.getIsApproval();
-                output.append("          {\n");
-                output.append("            \"account\":\"" + accountId.toString() + "\",\n");
-                output.append("            \"account_shard\":\"" + accountId.getShardNum() + "\",\n");
-                output.append("            \"account_realm\":\"" + accountId.getRealmNum() + "\",\n");
-                output.append("            \"account_number\":\"" + accountId.getEntityNum() + "\",\n");
-                output.append("            \"amount\":" + amount + ",\n");
-                output.append("            \"is_approval\":" + isApproval + "\n");
-                output.append("          }");
+                output.append(" \"{");
+                output.append(" \\\"account\\\":\\\"" + accountId.toString() + "\\\",");
+                output.append(" \\\"account_shard\\\":\\\"" + accountId.getShardNum() + "\\\",");
+                output.append(" \\\"account_realm\\\":\\\"" + accountId.getRealmNum() + "\\\",");
+                output.append(" \\\"account_number\\\":\\\"" + accountId.getEntityNum() + "\\\",");
+                output.append(" \\\"amount\\\":\\" + amount + "\\\",");
+                output.append(" \\\"is_approval\\\":" + isApproval);
+                output.append("}");
             }
         }
         if (output.length() > 0) {
-            output.append("\n      ]\n");
+            output.append(" ]\"");
         }
         return output.toString();
     }
@@ -452,25 +449,23 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
         TransferList transferList = tr.getTransferList();
         int transferCount = transferList.getAccountAmountsCount();
         if (transferCount > 0) {
-            output.append("        [\n");
+            output.append(" \"[");
             for (int i = 0; i < transferCount; ++i) {
                 var aa = transferList.getAccountAmounts(i);
                 EntityId account = EntityId.of(aa.getAccountID());
                 boolean isApproval = aa.getIsApproval();
-                output.append("          {\n");
-                output.append("            \"account\":\"" + account.toString() + "\",\n");
-                output.append("            \"account_shard\":\"" + account.getShardNum() + "\",\n");
-                output.append("            \"account_realm\":\"" + account.getRealmNum() + "\",\n");
-                output.append("            \"account_number\":\"" + account.getEntityNum() + "\",\n");
-                output.append("            \"amount\":" + aa.getAmount() + ",\n");
-                output.append("            \"is_approval\":" + isApproval + "\n");
-                output.append("          }");
+                output.append(" {");
+                output.append(" \\\"account\\\":\\\"" + account.toString() + "\\\",");
+                output.append(" \\\"account_shard\\\":\\\"" + account.getShardNum() + "\\\",");
+                output.append(" \\\"account_realm\\\":\\\"" + account.getRealmNum() + "\\\",");
+                output.append(" \\\"account_number\\\":\\\"" + account.getEntityNum() + "\\\",");
+                output.append(" \\\"amount\\\":" + aa.getAmount() + ",");
+                output.append(" \\\"is_approval\\\":" + isApproval + " }");
                 if (i < transferCount - 1) {
                     output.append(",");
                 }
-                output.append("\n");
             }
-            output.append("        ]\n");
+            output.append(" ]\"");
         }
         return output.toString();
     }
@@ -486,9 +481,9 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
             int nftTransferCount = nftTransfers.size();
             for (int nftTransferCounter = 0; nftTransferCounter < nftTransferCount; nftTransferCounter++) {
                 if (atLeastOneTokenFound) {
-                    output.append(",\n");
+                    output.append(",");
                 } else {
-                    output.append("[\n");
+                    output.append("[");
                     atLeastOneTokenFound = true;
                 }
                 NftTransfer nftTransfer = nftTransfers.get(nftTransferCounter);
@@ -496,26 +491,25 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
                 EntityId senderId = EntityId.of(nftTransfer.getSenderAccountID());
                 long serialNumber = nftTransfer.getSerialNumber();
                 boolean isApproval = nftTransfer.getIsApproval();
-                output.append("          {\n");
-                output.append("            \"payer_account\":\"" + payerAccountId.toString() + "\",\n");
-                output.append("            \"payer_account_shard\":\"" + payerAccountId.getShardNum() + "\",\n");
-                output.append("            \"payer_account_realm\":\"" + payerAccountId.getRealmNum() + "\",\n");
-                output.append("            \"payer_account_number\":\"" + payerAccountId.getEntityNum() + "\",\n");
-                output.append("            \"sender_account\":\"" + senderId.toString() + "\",\n");
-                output.append("            \"sender_account_shard\":\"" + senderId.getShardNum() + "\",\n");
-                output.append("            \"sender_account_realm\":\"" + senderId.getRealmNum() + "\",\n");
-                output.append("            \"sender_account_number\":\"" + senderId.getEntityNum() + "\",\n");
-                output.append("            \"receiver_account\":\"" + receiverId.toString() + "\",\n");
-                output.append("            \"receiver_account_shard\":\"" + receiverId.getShardNum() + "\",\n");
-                output.append("            \"receiver_account_realm\":\"" + receiverId.getRealmNum() + "\",\n");
-                output.append("            \"receiver_account_number\":\"" + receiverId.getEntityNum() + "\",\n");
-                output.append("            \"serial_number\":" + serialNumber + ",\n");
-                output.append("            \"is_approval\":" + isApproval + "\n");
-                output.append("          }");
+                output.append(" {");
+                output.append(" \\\"payer_account\\\":\\\"" + payerAccountId.toString() + "\",");
+                output.append(" \\\"payer_account_shard\\\":\\\"" + payerAccountId.getShardNum() + "\",");
+                output.append(" \\\"payer_account_realm\\\":\\\"" + payerAccountId.getRealmNum() + "\",");
+                output.append(" \\\"payer_account_number\\\":\\\"" + payerAccountId.getEntityNum() + "\",");
+                output.append(" \\\"sender_account\\\":\\\"" + senderId.toString() + "\",");
+                output.append(" \\\"sender_account_shard\\\":\\\"" + senderId.getShardNum() + "\",");
+                output.append(" \\\"sender_account_realm\\\":\\\"" + senderId.getRealmNum() + "\",");
+                output.append(" \\\"sender_account_number\\\":\\\"" + senderId.getEntityNum() + "\",");
+		output.append(" \\\"receiver_account\\\":\\\"" + receiverId.toString() + "\",");
+                output.append(" \\\"receiver_account_shard\\\":\\\"" + receiverId.getShardNum() + "\",");
+                output.append(" \\\"receiver_account_realm\\\":\\\"" + receiverId.getRealmNum() + "\",");
+                output.append(" \\\"receiver_account_number\\\":\\\"" + receiverId.getEntityNum() + "\",");
+                output.append(" \\\"serial_number\\\":" + serialNumber + ",");
+                output.append(" \\\"is_approval\":" + isApproval + " }");
             }
         };
         if (output.length() > 0) {
-            output.append("\n      ]\n");
+            output.append(" ]");
         }
         return output.toString();
     }
@@ -525,41 +519,41 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
         boolean atLeastOneLogFound = false;
         for (ContractLoginfo contractLoginfo : contractResult.getLogInfoList()) {
             if (atLeastOneLogFound) {
-                output.append(",\n");
+                output.append(",");
             } else {
-                output.append("[\n");
+                output.append("\"[");
                 atLeastOneLogFound = true;
             }
-            output.append("      {\n");
-            output.append("          \"bloom\":\"");
-            output.append(Base64.encodeBase64String(contractLoginfo.getBloom().toByteArray()) + "\",\n");
-            output.append("          \"data\":\"");
-            output.append(Base64.encodeBase64String(contractLoginfo.getData().toByteArray()) + "\",\n");
-            output.append("          \"index\":\"" + contractLoginfo.getTopicCount() + "\",\n");
+            output.append(" {");
+            output.append(" \\\"bloom\\\":\"");
+            output.append(Base64.encodeBase64String(contractLoginfo.getBloom().toByteArray()) + "\\\",");
+            output.append(" \\\"data\\\":\\\"");
+            output.append(Base64.encodeBase64String(contractLoginfo.getData().toByteArray()) + "\\\",");
+            output.append(" \\\"index\":\\\"" + contractLoginfo.getTopicCount() + "\\\",");
             if (contractLoginfo.getTopicCount() > 0) {
-                output.append("          \"topic0\":\"");
-                output.append(Base64.encodeBase64String(contractLoginfo.getTopic(0).toByteArray()) + "\",\n");
+                output.append(" \\\"topic0\\\":\\\"");
+                output.append(Base64.encodeBase64String(contractLoginfo.getTopic(0).toByteArray()) + "\\\",");
             }
             if (contractLoginfo.getTopicCount() > 1) {
-                output.append("          \"topic1\":\"");
-                output.append(Base64.encodeBase64String(contractLoginfo.getTopic(1).toByteArray()) + "\",\n");
+                output.append(" \\\"topic1\\\":\\\"");
+                output.append(Base64.encodeBase64String(contractLoginfo.getTopic(1).toByteArray()) + "\\\",");
             }
             if (contractLoginfo.getTopicCount() > 2) {
-                output.append("          \"topic2\":\"");
-                output.append(Base64.encodeBase64String(contractLoginfo.getTopic(2).toByteArray()) + "\",\n");
+                output.append(" \\\"topic2\\\":\\\"");
+                output.append(Base64.encodeBase64String(contractLoginfo.getTopic(2).toByteArray()) + "\\\",");
             }
             if (contractLoginfo.getTopicCount() > 3) {
-                output.append("          \"topic3\":\"");
-                output.append(Base64.encodeBase64String(contractLoginfo.getTopic(3).toByteArray()) + "\",\n");
+                output.append(" \\\"topic3\\\":\\\"");
+                output.append(Base64.encodeBase64String(contractLoginfo.getTopic(3).toByteArray()) + "\\\",");
             }
-            output.append("          \"payer_account_id\":\"" + payerAccountId.toString() + "\",\n");
-            output.append("          \"payer_account_shard\":\"" + payerAccountId.getShardNum() + "\",\n");
-            output.append("          \"payer_account_realm\":\"" + payerAccountId.getRealmNum() + "\",\n");
-            output.append("          \"payer_account_number\":\"" + payerAccountId.getEntityNum() + "\",\n");
-            output.append("      }");
+            output.append(" \\\"payer_account_id\\\":\\\"" + payerAccountId.toString() + "\\\",");
+            output.append(" \\\"payer_account_shard\\\":\\\"" + payerAccountId.getShardNum() + "\\\",");
+            output.append(" \\\"payer_account_realm\\\":\\\"" + payerAccountId.getRealmNum() + "\\\",");
+            output.append(" \\\"payer_account_number\\\":\\\"" + payerAccountId.getEntityNum() + "\\\",");
+            output.append(" }");
         };
         if (output.length() > 0) {
-            output.append("\n    ]\n");
+            output.append(" ]\"");
         }
         return output.toString();
     }
@@ -568,37 +562,42 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
     // the "contract_results" data items are found, we return an array of the one contract_result.
     private String buildContractResults(ContractFunctionResult contractResult, EntityId payerAccountId) {
         StringBuilder output = new StringBuilder();
-        output.append("[\n");
-        output.append("      {\n");
-        output.append("        \"function_parameters\":\"");
-        output.append(Base64.encodeBase64String(contractResult.getFunctionParameters().toByteArray()) + "\",\n");
-        output.append("        \"gas_limit\":\"" + contractResult.getGas() + "\",\n");
-        output.append("        \"function_result\":\"");
-        output.append(Base64.encodeBase64String(contractResult.toByteArray()) + "\",\n");
-        output.append("        \"gas_used\":\"" + contractResult.getGasUsed() + "\",\n");
-        output.append("        \"amount\":\"" + contractResult.getAmount() + "\",\n");
-        output.append("        \"call_result\":\"");
-        output.append(Base64.encodeBase64String(contractResult.getContractCallResult().toByteArray()) + "\",\n");
-        output.append("        \"created_contract_ids\":[\n");
+        output.append("\"[");
+        output.append(" {");
+        output.append(" \\\"function_parameters\\\":\\\"");
+        output.append(Base64.encodeBase64String(contractResult.getFunctionParameters().toByteArray()) + "\\\",");
+        output.append(" \\\"gas_limit\\\":\\\"" + contractResult.getGas() + "\\\",");
+        output.append(" \\\"function_result\\\":\\\"");
+        output.append(Base64.encodeBase64String(contractResult.toByteArray()) + "\\\",");
+        output.append(" \\\"gas_used\\\":\\\"" + contractResult.getGasUsed() + "\\\",");
+        output.append(" \\\"amount\\\":\\\"" + contractResult.getAmount() + "\\\",");
+        output.append(" \\\"call_result\\\":\\\"");
+        output.append(Base64.encodeBase64String(contractResult.getContractCallResult().toByteArray()) + "\\\",");
+        output.append(" \\\"created_contract_ids\\\":\"[");
+        boolean firstContract = true;
         for (ContractID contractId : contractResult.getCreatedContractIDsList()) {
+            if (firstContract) {
+                firstContract = false;
+            } else {
+                output.append(",");
+            }
             EntityId contractEntity = EntityId.of(contractId);
-            output.append("          \"contractNum\":\"" + contractEntity.toString() + "\",\n");
+            output.append(" \\\"" + contractEntity.toString() + "\\\"");
         }
-        output.append("        ],\n");
-        output.append("        \"error_message\":\"" + contractResult.getErrorMessage() + "\",\n");
+        output.append(" ]\",");
+        output.append(" \\\"error_message\\\":\\\"" + contractResult.getErrorMessage() + "\\\",");
         EntityId senderAccountId = EntityId.of(contractResult.getSenderId());
-        output.append("        \"sender_account_id\":\"" + senderAccountId.toString() + "\",\n");
-        output.append("        \"sender_account_shard\":\"" + senderAccountId.getShardNum() + "\",\n");
-        output.append("        \"sender_account_realm\":\"" + senderAccountId.getRealmNum() + "\",\n");
-        output.append("        \"sender_account_number\":\"" + senderAccountId.getEntityNum() + "\",\n");
-        output.append("        \"payer_account_id\":\"" + payerAccountId.toString() + "\",\n");
-        output.append("        \"payer_account_shard\":\"" + payerAccountId.getShardNum() + "\",\n");
-        output.append("        \"payer_account_realm\":\"" + payerAccountId.getRealmNum() + "\",\n");
-        output.append("        \"payer_account_number\":\"" + payerAccountId.getEntityNum() + "\",\n");
-        output.append("        \"bloom\":\"");
-        output.append(Base64.encodeBase64String(contractResult.getBloom().toByteArray()) + "\"\n");
-        output.append("      }\n");
-        output.append("    ]\n");
+        output.append(" \\\"sender_account_id\\\":\\\"" + senderAccountId.toString() + "\\\",");
+        output.append(" \\\"sender_account_shard\\\":\\\"" + senderAccountId.getShardNum() + "\\\",");
+        output.append(" \\\"sender_account_realm\\\":\\\"" + senderAccountId.getRealmNum() + "\\\",");
+        output.append(" \\\"sender_account_number\\\":\\\"" + senderAccountId.getEntityNum() + "\\\",");
+        output.append(" \\\"payer_account_id\\\":\\\"" + payerAccountId.toString() + "\\\",");
+        output.append(" \\\"payer_account_shard\\\":\\\"" + payerAccountId.getShardNum() + "\\\",");
+        output.append(" \\\"payer_account_realm\\\":\\\"" + payerAccountId.getRealmNum() + "\\\",");
+        output.append(" \\\"payer_account_number\\\":\\\"" + payerAccountId.getEntityNum() + "\\\",");
+        output.append(" \\\"bloom\\\":\\\"");
+        output.append(Base64.encodeBase64String(contractResult.getBloom().toByteArray()) + "\\\"");
+        output.append("} ]\\\"");
         return output.toString();
     }
 
@@ -609,29 +608,29 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
             EntityId contractId = EntityId.of(contractStateChange.getContractID());
             for (StorageChange storageChange : contractStateChange.getStorageChangesList()) {
                 if (atLeastOneStateChangeFound) {
-                    output.append(",\n");
+                    output.append(",");
                 } else {
-                    output.append("[\n");
+                    output.append("\"[");
                     atLeastOneStateChangeFound = true;
                 }
 
-                output.append("      {\n");
-                output.append("          \"contract_id\":\"" + contractId.toString() + "\",\n");
-                output.append("          \"value_written\":\"");
-                output.append(Base64.encodeBase64String(storageChange.getValueWritten().toByteArray()) + "\",\n");
-                output.append("          \"value_read\":\"");
-                output.append(Base64.encodeBase64String(storageChange.getValueRead().toByteArray()) + "\",\n");
-                output.append("          \"slot\":\"");
-                output.append(Base64.encodeBase64String(storageChange.getSlot().toByteArray()) + "\",\n");
-                output.append("          \"payer_account_id\":\"" + payerAccountId.toString() + "\",\n");
-                output.append("          \"payer_account_shard\":\"" + payerAccountId.getShardNum() + "\",\n");
-                output.append("          \"payer_account_realm\":\"" + payerAccountId.getRealmNum() + "\",\n");
-                output.append("          \"payer_account_number\":\"" + payerAccountId.getEntityNum() + "\",\n");
-                output.append("      }");
+                output.append(" {");
+                output.append(" \\\"contract_id\\\":\\\"" + contractId.toString() + "\\\",");
+                output.append(" \\\"value_written\\\":\\\"");
+                output.append(Base64.encodeBase64String(storageChange.getValueWritten().toByteArray()) + "\\\",");
+                output.append(" \\\"value_read\":\\\"");
+                output.append(Base64.encodeBase64String(storageChange.getValueRead().toByteArray()) + "\\\",");
+                output.append(" \\\"slot\":\\\"");
+                output.append(Base64.encodeBase64String(storageChange.getSlot().toByteArray()) + "\\\",");
+                output.append(" \\\"payer_account_id\\\":\\\"" + payerAccountId.toString() + "\\\",");
+                output.append(" \\\"payer_account_shard\\\":\\\"" + payerAccountId.getShardNum() + "\\\",");
+                output.append(" \\\"payer_account_realm\\\":\\\"" + payerAccountId.getRealmNum() + "\\\",");
+                output.append(" \\\"payer_account_number\\\":\\\"" + payerAccountId.getEntityNum() + "\\\"");
+                output.append(" }");
             }
         }
         if (output.length() > 0) {
-            output.append("\n    ]\n");
+            output.append("]\"");
         }
         return output.toString();
     }
