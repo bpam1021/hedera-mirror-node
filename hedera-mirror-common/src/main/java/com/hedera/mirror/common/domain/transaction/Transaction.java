@@ -138,7 +138,7 @@ public class Transaction implements Persistable<Long> {
             final String comma = ",";
             final String commaString = "\\\",";
             StringBuilder sb = new StringBuilder()
-                .append("\"{")
+                .append("\"{ ")
                 .append(quote)
                 .append("payer_account_id")
                 .append(equalsString)
@@ -198,7 +198,7 @@ public class Transaction implements Persistable<Long> {
                 .append("errata")
                 .append(equalsString)
                 .append(errata == null ? "" : errata.name())
-                .append("\"}\"");
+                .append("\\\"}\"");
             return sb.toString();
         } else {
             return "\"Unknown designator\":\"" + designator + "\"";
