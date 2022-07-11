@@ -55,11 +55,16 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 import javax.inject.Named;
 import org.apache.commons.codec.binary.Base64;
-//NOT_YET import org.apache.kafka.celints.producer.KafkaProducer;
-//NOT_YET import org.apache.kafka.celints.producer.Producer;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.logging.log4j.Level;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -90,6 +95,11 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
 
     // StringBuilder used to put together / dump out a Json Array.
     private final StringBuilder jsonArray = new StringBuilder();
+
+    // constants (e.g. Kafka properties)
+    private final static String KAFKA_BOOTSTRAP_SERVERS = "10.28.129.99:9092";
+    private final static String TRANSACTION_TOPIC_NAME = "transaction_record";
+    private final static String RECORD_FILE_TOPIC_NAME = "record_file";
 
     public RecordFileParser(MeterRegistry meterRegistry, RecordParserProperties parserProperties,
                             StreamFileRepository<RecordFile, Long> streamFileRepository,
@@ -255,6 +265,34 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
             writeFile(filenameRecordFile, recordFileContents.toString());
             recordFile.finishLoad(count);
             recordStreamFileListener.onEnd(recordFile);
+
+            String kafkaMessageKey = destFile.toString();
+            kafkaMessageKey = kafkaMessageKey.substring(kafkaMessageKey.lastIndexOf("/") + 1);
+            long kaftaStarttime = System.currentTimeMillis();
+            try {
+                Producer<String, String> kafkaProducer = createKafkaProducer();
+                ProducerRecord<String, String> transactionKafkaRecord = new ProducerRecord<>(TRANSACTION_TOPIC_NAME,
+                        kafkaMessageKey, contents);
+                ProducerRecord<String, String> recordFileKafkaRecord = new ProducerRecord<>(RECORD_FILE_TOPIC_NAME,
+                        kafkaMessageKey, recordFileContents.toString());
+
+                RecordMetadata transactionMetadata = kafkaProducer.send(transactionKafkaRecord).get();
+                // should we call kafkaProducer.flush() ?
+                long elapsedTime1 = System.currentTimeMillis() - kaftaStarttime;
+                log.info("Produced Transaction Kafka message (key={}, value={}), meta(partition={}, offset={}, time={}",
+                        transactionKafkaRecord.key(), transactionKafkaRecord.value(), transactionMetadata.partition(),
+                        transactionMetadata.offset(), elapsedTime1);
+                long kaftaStarttime2 = System.currentTimeMillis();
+                RecordMetadata recordFileMetadata = kafkaProducer.send(recordFileKafkaRecord).get();
+                // should we call kafkaProducer.flush() ?
+                long elapsedTime2 = System.currentTimeMillis() - kaftaStarttime2;
+                log.info("Produced Record File Kafka message (key={}, value={}), meta(partition={}, offset={}, time={}",
+                        recordFileKafkaRecord.key(), recordFileKafkaRecord.value(), recordFileMetadata.partition(),
+                        recordFileMetadata.offset(), elapsedTime2);
+            } catch (Exception e) {
+                log.error("Error posting message to Kafka", e);
+                // kafkaProducer.close();
+            }
         } catch (Exception ex) {
             recordStreamFileListener.onError();
             throw ex;
@@ -664,5 +702,15 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
         Instant consensusTimestamp = Utility.convertToInstant(recordItem.getRecord().getConsensusTimestamp());
         latencyMetrics.getOrDefault(recordItem.getTransactionType(), unknownLatencyMetric)
                 .record(Duration.between(consensusTimestamp, Instant.now()));
+    }
+
+    // Kafka client functionality
+    private static Producer<String, String> createKafkaProducer() {
+        Properties properties = new Properties();
+        properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_BOOTSTRAP_SERVERS);
+        properties.put(ProducerConfig.CLIENT_ID_CONFIG, "ImporterForPinotKafkaProducer");
+        properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        return new KafkaProducer<>(properties);
     }
 }
