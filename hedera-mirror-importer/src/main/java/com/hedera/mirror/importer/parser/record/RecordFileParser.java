@@ -58,6 +58,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.inject.Named;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.kafka.celints.producer.KafkaProducer;
+import org.apache.kafka.celints.producer.Producer;
 import org.apache.logging.log4j.Level;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -521,7 +523,7 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
             if (atLeastOneLogFound) {
                 output.append(",");
             } else {
-                output.append("\\\"[");
+                output.append("\"[");
                 atLeastOneLogFound = true;
             }
             output.append(" {");
@@ -553,7 +555,7 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
             output.append(" }");
         };
         if (output.length() > 0) {
-            output.append(" ]\\\"");
+            output.append(" ]\"");
         }
         return output.toString();
     }
@@ -562,7 +564,7 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
     // the "contract_results" data items are found, we return an array of the one contract_result.
     private String buildContractResults(ContractFunctionResult contractResult, EntityId payerAccountId) {
         StringBuilder output = new StringBuilder();
-        output.append("\\\"[");
+        output.append("\"[");
         output.append(" {");
         output.append(" \\\"function_parameters\\\":\\\"");
         output.append(Base64.encodeBase64String(contractResult.getFunctionParameters().toByteArray()) + "\\\",");
@@ -597,7 +599,7 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
         output.append(" \\\"payer_account_number\\\":\\\"" + payerAccountId.getEntityNum() + "\\\",");
         output.append(" \\\"bloom\\\":\\\"");
         output.append(Base64.encodeBase64String(contractResult.getBloom().toByteArray()) + "\\\"");
-        output.append("} ]\\\"");
+        output.append("} ]\"");
         return output.toString();
     }
 
