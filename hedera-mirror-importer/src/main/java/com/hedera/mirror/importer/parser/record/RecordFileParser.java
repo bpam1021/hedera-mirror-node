@@ -562,7 +562,7 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
     // the "contract_results" data items are found, we return an array of the one contract_result.
     private String buildContractResults(ContractFunctionResult contractResult, EntityId payerAccountId) {
         StringBuilder output = new StringBuilder();
-        output.append("\"[");
+        output.append("\\\"[");
         output.append(" {");
         output.append(" \\\"function_parameters\\\":\\\"");
         output.append(Base64.encodeBase64String(contractResult.getFunctionParameters().toByteArray()) + "\\\",");
