@@ -521,15 +521,15 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
             if (atLeastOneLogFound) {
                 output.append(",");
             } else {
-                output.append("\"[");
+                output.append("\\\"[");
                 atLeastOneLogFound = true;
             }
             output.append(" {");
-            output.append(" \\\"bloom\\\":\"");
+            output.append(" \\\"bloom\\\":\\\"");
             output.append(Base64.encodeBase64String(contractLoginfo.getBloom().toByteArray()) + "\\\",");
             output.append(" \\\"data\\\":\\\"");
             output.append(Base64.encodeBase64String(contractLoginfo.getData().toByteArray()) + "\\\",");
-            output.append(" \\\"index\":\\\"" + contractLoginfo.getTopicCount() + "\\\",");
+            output.append(" \\\"index\\\":\\\"" + contractLoginfo.getTopicCount() + "\\\",");
             if (contractLoginfo.getTopicCount() > 0) {
                 output.append(" \\\"topic0\\\":\\\"");
                 output.append(Base64.encodeBase64String(contractLoginfo.getTopic(0).toByteArray()) + "\\\",");
@@ -549,11 +549,11 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
             output.append(" \\\"payer_account_id\\\":\\\"" + payerAccountId.toString() + "\\\",");
             output.append(" \\\"payer_account_shard\\\":\\\"" + payerAccountId.getShardNum() + "\\\",");
             output.append(" \\\"payer_account_realm\\\":\\\"" + payerAccountId.getRealmNum() + "\\\",");
-            output.append(" \\\"payer_account_number\\\":\\\"" + payerAccountId.getEntityNum() + "\\\",");
+            output.append(" \\\"payer_account_number\\\":\\\"" + payerAccountId.getEntityNum() + "\\\"");
             output.append(" }");
         };
         if (output.length() > 0) {
-            output.append(" ]\"");
+            output.append(" ]\\\"");
         }
         return output.toString();
     }
