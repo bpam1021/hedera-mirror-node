@@ -266,6 +266,7 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
             recordFile.finishLoad(count);
             recordStreamFileListener.onEnd(recordFile);
 
+            log.warn("MYK: About to start doing things for Kafka...");
             String kafkaMessageKey = destFile.toString();
             kafkaMessageKey = kafkaMessageKey.substring(kafkaMessageKey.lastIndexOf("/") + 1);
             long kaftaStarttime = System.currentTimeMillis();
@@ -289,6 +290,7 @@ public class RecordFileParser extends AbstractStreamFileParser<RecordFile> {
                 log.info("Produced Record File Kafka message (key={}, value={}), meta(partition={}, offset={}, time={}",
                         recordFileKafkaRecord.key(), recordFileKafkaRecord.value(), recordFileMetadata.partition(),
                         recordFileMetadata.offset(), elapsedTime2);
+                log.warn("MYK: Done with Kafka processing for this record.");
             } catch (Exception e) {
                 log.error("Error posting message to Kafka", e);
                 // kafkaProducer.close();
